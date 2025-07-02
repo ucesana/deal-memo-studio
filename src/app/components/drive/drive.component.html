@@ -1,0 +1,8 @@
+<app-drive-tree
+  #driveTree
+  [parentId]="parentId"
+  (select)="select($event)"
+  [contextMenuItems]="contextMenuItems"
+  [searchQuery]="searchQuery"
+  [height]="'calc(100vh - 64px - 64px - 16px)'"
+></app-drive-tree>

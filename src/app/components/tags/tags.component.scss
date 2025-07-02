@@ -1,0 +1,11 @@
+:host {
+  .tags-container {
+    overflow-y: auto;
+    padding-left: 8px;
+
+    mat-chip {
+      margin: 0 4px 4px 0;
+      font-size: 14px;
+    }
+  }
+}

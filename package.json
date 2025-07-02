@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "prettier-write": "npx prettier . --write",
+    "prettier-check": "npx prettier . --check"
   },
   "private": true,
   "dependencies": {
@@ -18,6 +20,9 @@
     "@angular/material": "^20.0.2",
     "@angular/platform-browser": "^20.0.0",
     "@angular/router": "^20.0.0",
+    "@ngneat/until-destroy": "^10.0.0",
+    "ngx-cookie-service": "^20.0.1",
+    "ngx-extended-pdf-viewer": "^23.3.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
@@ -26,6 +31,14 @@
     "@angular/build": "^20.0.1",
     "@angular/cli": "^20.0.1",
     "@angular/compiler-cli": "^20.0.0",
+    "@types/gapi": "^0.0.47",
+    "@types/gapi.auth2": "^0.0.61",
+    "@types/gapi.client": "^1.0.8",
+    "@types/gapi.client.docs-v1": "^0.0.4",
+    "@types/gapi.client.drive": "^3.0.15",
+    "@types/gapi.client.sheets": "^4.0.20201031",
+    "@types/gapi.client.sheets-v4": "^0.0.4",
+    "@types/google.accounts": "^0.0.16",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.7.0",
     "karma": "~6.4.0",
@@ -33,6 +46,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "prettier": "3.5.3",
     "typescript": "~5.8.2"
   }
 }

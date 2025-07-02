@@ -1,0 +1,39 @@
+<div class="pdf-viewer-container" [style.height]="height">
+  @if (base64Src) {
+  <ngx-extended-pdf-viewer
+    [base64Src]="base64Src"
+    [textLayer]="true"
+    [showSidebarButton]="true"
+    [showFindButton]="true"
+    [showToolbar]="true"
+    [showZoomButtons]="true"
+    [zoom]="'page-width'"
+    [style.height]="height"
+    [style.width]="width"
+    (updateFindMatchesCount)="updateFindMatchesCount($event)"
+    (updateFindState)="updateFindState($event)"
+    (pdfLoaded)="onPdfLoaded($event)"
+    [showBorders]="true"
+    [backgroundColor]="backgroundColor"
+  >
+  </ngx-extended-pdf-viewer>
+  } @else if (src) {
+  <ngx-extended-pdf-viewer
+    [src]="src"
+    [textLayer]="true"
+    [showSidebarButton]="true"
+    [showFindButton]="true"
+    [showToolbar]="true"
+    [showZoomButtons]="true"
+    [zoom]="'page-width'"
+    [style.height]="height"
+    [style.width]="width"
+    (updateFindMatchesCount)="updateFindMatchesCount($event)"
+    (updateFindState)="updateFindState($event)"
+    (pdfLoaded)="onPdfLoaded($event)"
+    [showBorders]="true"
+    [backgroundColor]="backgroundColor"
+  >
+  </ngx-extended-pdf-viewer>
+  }
+</div>

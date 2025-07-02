@@ -1,3 +1,15 @@
+<app-progress-bar [progress]="appLoadProgress$ | async"></app-progress-bar>
 <app-layout>
-  <router-outlet />
+  <router-outlet></router-outlet>
 </app-layout>
+<button
+  matFab
+  color="primary"
+  class="fab-create"
+  aria-label="Start creating deal memos"
+  (click)="createNewDealMemos()"
+  matTooltip="Start creating deal memos"
+  matTooltipPosition="left"
+>
+  <mat-icon>create</mat-icon>
+</button>

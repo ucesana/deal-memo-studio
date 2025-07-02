@@ -1,0 +1,15 @@
+<app-context-menu
+  #driveTreeContextMenu
+  [contextMenuItems]="contextMenuItems"
+></app-context-menu>
+
+<app-path-breadcrumb [path]="path"></app-path-breadcrumb>
+<div class="is-flex flex-wrap flex-space-between">
+  @for (node of nodes$ | async; track node) {
+  <app-file-icon
+    [node]="node"
+    (click)="selectFile(node)"
+    (contextmenu)="openContextMenu(node, $event)"
+  ></app-file-icon>
+  }
+</div>

@@ -1,0 +1,22 @@
+.tag-data-container {
+  padding: 8px;
+  overflow-y: auto;
+
+  mat-chip {
+    margin: 0 4px 4px 0;
+    font-size: 12px;
+  }
+
+  .tag-data-action-buttons {
+    padding-bottom: 20px;
+  }
+
+  .example-headers-align .mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .example-headers-align .mat-mdc-form-field + .mat-mdc-form-field {
+    margin-left: 8px;
+  }
+}

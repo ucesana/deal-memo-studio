@@ -1,0 +1,23 @@
+mat-toolbar {
+  padding-left: 0;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+mat-sidenav {
+  width: 400px;
+  padding: 8px;
+}
+
+.sidenav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}

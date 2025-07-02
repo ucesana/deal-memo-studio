@@ -1,0 +1,7 @@
+<app-spreadsheet-table
+  [spreadsheet]="spreadsheet$ | async"
+  (sheetsSelection)="selectSheets($event)"
+  (tagData)="selectTagData($event)"
+  (reload)="loadSpreadsheet(id)"
+  [height]="'calc(100vh - 64px - 64px - 32px)'"
+></app-spreadsheet-table>

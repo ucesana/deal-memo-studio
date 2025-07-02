@@ -1,0 +1,37 @@
+.path-container {
+  margin: 16px 0;
+  padding: 12px 24px;
+  background: var(--mat-list-list-item-container-color, transparent);
+}
+
+.path-breadcrumb {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+}
+
+.breadcrumb-part {
+  font-weight: 500;
+  color: var(--mat-stepper-header-selected-state-icon-background-color, var(--mat-sys-primary));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.breadcrumb-last {
+    color: var(--mat-stepper-header-selected-state-icon-background-color, var(--mat-sys-primary));
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+}
+
+mat-icon {
+  font-size: 1.5rem;
+  margin: 0 4px;
+  vertical-align: middle;
+}
+
+a {
+  color: var(--mat-stepper-header-selected-state-icon-background-color, var(--mat-sys-primary));
+  cursor: pointer;
+  text-decoration: none;
+}

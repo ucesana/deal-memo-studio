@@ -1,0 +1,12 @@
+@if (isLoggedIn$ | async) {
+  <p (click)="animateWelcome()" class="ml3">Hello. You are logged in.</p>
+  <p>Access your Google Drive by clicking on the links in the menu.</p>
+  <button matButton="elevated" (click)="logoutGoogle()">
+    Logout of Google
+  </button>
+} @else {
+  <p>You are logged out.</p>
+  <button matButton="elevated" (click)="loginGoogle()">
+    Login with Google
+  </button>
+}

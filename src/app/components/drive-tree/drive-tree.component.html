@@ -1,0 +1,62 @@
+<app-context-menu
+  #driveTreeContextMenu
+  [contextMenuItems]="contextMenuItems"
+></app-context-menu>
+
+<mat-toolbar>
+  @if (rootFolder) {
+    <h2>{{ rootFolder.name }}</h2>
+  } @else {
+    <h2>My Drive</h2>
+  }
+  <span class="spacer"></span>
+  <button
+    type="button"
+    aria-label="Refresh"
+    matIconButton
+    (click)="refresh()"
+    [disabled]="!(isLoggedIn$ | async)"
+    matTooltip="Refresh"
+  >
+    <mat-icon aria-label="Refresh">refresh</mat-icon>
+  </button>
+</mat-toolbar>
+
+<div class="tree-container" [style.height]="height">
+  @if (!loaded) {
+    <div class="spinner-container">
+      <mat-spinner></mat-spinner>
+    </div>
+  } @else {
+    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+      <mat-tree-node
+        *matTreeNodeDef="let node"
+        matTreeNodeToggle
+        matTreeNodePadding
+        (click)="selectFile(node)"
+        (contextmenu)="openContextMenu(node, $event)"
+      >
+        <app-file-icon [node]="node"></app-file-icon>
+      </mat-tree-node>
+
+      <mat-tree-node
+        *matTreeNodeDef="let node; when: hasChild"
+        matTreeNodePadding
+        (click)="selectFile(node)"
+        (contextmenu)="openContextMenu(node, $event)"
+      >
+        <button
+          matIconButton
+          matTreeNodeToggle
+          [attr.aria-label]="'Toggle ' + node.name + '[' + node.id + ']'"
+        >
+          <mat-icon class="mat-icon-rtl-mirror" (click)="toggleFolder(node)">
+            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+          </mat-icon>
+        </button>
+
+        <app-file-icon [node]="node"></app-file-icon>
+      </mat-tree-node>
+    </mat-tree>
+  }
+</div>

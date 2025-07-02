@@ -1,0 +1,79 @@
+<div>
+  <mat-toolbar>
+    @if (doc$ | async; as doc) {
+      <h2>{{ doc.content.title }}</h2>
+    } @else {
+      <h2></h2>
+    }
+
+    @if ((docLoadState$ | async) == "error") {
+      <h2>Oh oh!</h2>
+    }
+    <span class="spacer"></span>
+    <button
+      type="button"
+      aria-label="Refresh"
+      matIconButton
+      (click)="refresh()"
+      [disabled]="!(isLoggedIn$ | async)"
+      matTooltip="Refresh"
+    >
+      <mat-icon aria-label="Refresh">refresh</mat-icon>
+    </button>
+    <button mat-raised-button (click)="toggleHighlightTags()">
+      Highlight Tags
+    </button>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="sidenav-container" [style.height]="height">
+    <mat-sidenav
+      #hightlightTagsDrawer
+      mode="side"
+      position="end"
+      [(opened)]="isPanelOpen"
+      [fixedInViewport]="false"
+      [fixedTopGap]="0"
+      [fixedBottomGap]="0"
+    >
+      <div class="sidenav-header">
+        <h2>Tags</h2>
+        <button
+          type="button"
+          aria-label="Close"
+          matIconButton
+          (click)="toggleHighlightTags()"
+        >
+          <mat-icon aria-label="Close">close</mat-icon>
+        </button>
+      </div>
+      <app-tags [tags]="tags" [tagErrors]="tagErrors"></app-tags>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      @switch (docLoadState$ | async) {
+        @case ("loading") {
+          <div class="spinner-container">
+            <mat-spinner></mat-spinner>
+          </div>
+        }
+        @case ("loaded") {
+          @if (doc$ | async; as doc) {
+            <app-pdf-viewer
+              #pdfViewer
+              [base64Src]="doc.pdf"
+              [height]="height"
+              [width]="width"
+              (pdfLoaded)="pdfLoaded($event)"
+              [backgroundColor]="
+                'var(--mat-sidenav-content-background-color, var(--mat-sys-background))'
+              "
+            >
+            </app-pdf-viewer>
+          }
+        }
+        @case ("error") {
+          <div class="error">Something went wrong loading the document.</div>
+        }
+      }
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

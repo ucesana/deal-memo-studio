@@ -1,0 +1,114 @@
+<mat-stepper [linear]="true" #stepper>
+  <mat-step [label]="'Select Template'" [completed]="!!selectedTemplate">
+    @if (selectedTemplate) {
+      @if (selectedTemplate.id) {
+        <app-documents
+          [id]="selectedTemplate.id"
+          [height]="'calc(100vh - 128px - 16px - 72px - 56px - 16px)'"
+          [width]="'812px'"
+        ></app-documents>
+      }
+    } @else {
+      <app-drive-selector
+        [parentId]="'root'"
+        (selectedFile)="selectedFile($event)"
+      ></app-drive-selector>
+    }
+    <div class="button-container">
+      @if (!!selectedTemplate) {
+        <button matButton="elevated" (click)="selectedTemplate = null">
+          Select new template
+        </button>
+      }
+      <button
+        matButton="elevated"
+        (click)="next()"
+        [disabled]="!selectedTemplate"
+      >
+        Next
+      </button>
+    </div>
+  </mat-step>
+  <mat-step [label]="'Select Tags'" [completed]="!!selectedTagData?.length">
+    <app-tag-selector
+      #tagSelector
+      (sheetSelection)="selectSheets($event)"
+      (tagData)="selectTagData($event)"
+    ></app-tag-selector>
+    <div class="button-container">
+      <button matButton="elevated" (click)="cancel()">Cancel</button>
+      <button matButton="elevated" matStepperPrevious>Back</button>
+      <button
+        matButton="elevated"
+        (click)="next()"
+        [disabled]="!selectedTagData?.[0]?.length"
+      >
+        Next
+      </button>
+    </div>
+  </mat-step>
+  <mat-step
+    [label]="'Review'"
+    [stepControl]="reviewFormGroup"
+    [completed]="reviewFormGroup.valid"
+  >
+    <form [formGroup]="reviewFormGroup">
+      <div>
+        <mat-form-field>
+          <mat-label>Deal Memo Folder Prefix</mat-label>
+          <input
+            #dealMemoNameInput
+            matInput
+            formControlName="name"
+            placeholder="Deal Memo folder prefix"
+            required
+          />
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-checkbox formControlName="pdf">Include PDF copies </mat-checkbox>
+      </div>
+      <div class="button-container">
+        <button matButton="elevated" (click)="cancel()">Cancel</button>
+        <button matButton="elevated" matStepperPrevious>Back</button>
+        <button matButton="elevated" (click)="next()">Next</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [label]="'Create'" [completed]="!!dealMemos.length">
+    <div>
+      <div>
+        <div class="progress-container">
+          <button
+            matButton="elevated"
+            color="primary"
+            (click)="create()"
+            [disabled]="isCreating"
+            class="progress-container-create"
+          >
+            @if (isCreating) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              Create
+            }
+          </button>
+
+          <mat-progress-bar
+            mode="determinate"
+            [value]="(progress$ | async)?.progress"
+            class="progress-bar"
+          ></mat-progress-bar>
+          <span class="progress-text"
+            >{{ (progress$ | async)?.progress ?? 0 }}%</span
+          >
+        </div>
+      </div>
+      @if (destinationFolder.length) {
+        <app-drive-list
+          [path]="destinationFolder"
+          [contextMenuItems]="driveListContextMenuItems"
+        ></app-drive-list>
+      }
+    </div>
+  </mat-step>
+</mat-stepper>

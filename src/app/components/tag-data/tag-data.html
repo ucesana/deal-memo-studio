@@ -1,0 +1,42 @@
+<div class="tag-data-container">
+  @if (data[0] && data[0].length === 0) {
+  <p>Select rows to preview the deal memos you can generate.</p>
+  } @else {
+
+  <p>
+    Selected {{ data[0].length }} tags for {{ data.length }} Deal Memo{{
+    data.length === 1 ? '' : 's' }}.
+  </p>
+
+  <div class="tag-data-action-buttons">
+    <button matButton="elevated" (click)="accordion().openAll()">
+      Expand All
+    </button>
+    <button matButton="elevated" (click)="accordion().closeAll()">
+      Collapse All
+    </button>
+  </div>
+  }
+  <mat-accordion class="tag-data-headers-align" multi>
+    @for (tagData of data; track tagData; let i = $index) { @if (tagData.length
+    > 0) {
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title
+          >{{ tagData | tagValue: 'Artist Name': `Deal Memo #${i}`
+          }}</mat-panel-title
+        >
+      </mat-expansion-panel-header>
+
+      @for (tag of tagData; track tag) {
+      <div class="no-wrap">
+        <mat-chip matTooltip="{{ tag[0] }}: {{ tag[1] }}" color="primary">
+          {{ tag[0] }}
+        </mat-chip>
+        <span>: {{ tag[1] }}</span>
+      </div>
+      }
+    </mat-expansion-panel>
+    } }
+  </mat-accordion>
+</div>

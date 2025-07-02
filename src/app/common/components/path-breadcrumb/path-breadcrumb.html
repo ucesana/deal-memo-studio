@@ -1,0 +1,20 @@
+<app-context-menu
+  #driveTreeContextMenu
+  [contextMenuItems]="contextMenuItems"
+></app-context-menu>
+
+<mat-card class="path-container">
+  <div class="path-breadcrumb">
+    @for (part of pathParts; track part; let isLast = $last) {
+    <span class="breadcrumb-part" [ngClass]="{'breadcrumb-last': isLast}">
+      <a
+        routerLink="/drive/{{part.id}}"
+        (contextmenu)="openContextMenu(part.id, $event)"
+        >{{ part.name }}</a
+      >
+    </span>
+    @if (!isLast) {
+    <mat-icon color="primary">chevron_right</mat-icon>
+    }}
+  </div>
+</mat-card>

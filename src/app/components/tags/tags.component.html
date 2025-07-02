@@ -1,0 +1,29 @@
+<div class="tags-container">
+  @if (tags.length) {
+    <p>Found {{ tags.length }} tag{{ tags.length === 1 ? "" : "s" }}.</p>
+    <mat-chip-set>
+      @for (tag of tags; track tag) {
+        <mat-chip color="primary">
+          {{ tag }}
+        </mat-chip>
+      }
+    </mat-chip-set>
+  } @else {
+    <p>Found no tags.</p>
+  }
+
+  @if (tagErrors && tagErrors.length > 0) {
+    <div class="error mat-elevation-z2">
+      <mat-icon color="warn" inline>error_outline</mat-icon>
+      <p>
+        There is something wrong with the tags in your document. Please review
+        and fix the following issues:
+      </p>
+      @for (error of tagErrors; track error) {
+        <ul>
+          <li class="error-message">{{ error }}</li>
+        </ul>
+      }
+    </div>
+  }
+</div>

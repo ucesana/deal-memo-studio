@@ -1,0 +1,29 @@
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+
+  button.progress-container-create {
+    width: 124px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+.progress-bar {
+  flex: 1;
+}
+
+.progress-text {
+  white-space: nowrap;
+}
+
+.button-container {
+  padding: 8px;
+
+  button {
+    margin-right: 8px;
+  }
+}

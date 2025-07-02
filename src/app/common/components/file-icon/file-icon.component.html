@@ -1,0 +1,21 @@
+<div class="vertical-center">
+  <ng-template #fileIcon>
+    <mat-icon
+      class="type-icon"
+      [attr.aria-label]="node.type + 'icon'"
+      [style.color]="node.iconColor"
+    >
+      {{ node.icon }}
+    </mat-icon>
+  </ng-template>
+
+  @if (node.warning?.length) {
+    <span matBadge="1" matBadgeSize="small" [matTooltip]="node.warning">
+      <div *ngTemplateOutlet="fileIcon"></div>
+    </span>
+  } @else {
+    <div *ngTemplateOutlet="fileIcon"></div>
+  }
+
+  <span class="file-icon-title" [matTooltip]="node.name">{{ node.name }}</span>
+</div>

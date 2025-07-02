@@ -2,23 +2,99 @@
 
 @include mat.core();
 
-$angular-material-3-theme: mat.define-theme(
-    (
-      color: (
-        theme-type: light,
-        primary: mat.$rose-palette,
-        tertiary: mat.$violet-palette,
-      ),
-      density: (
-        scale: 0,
-      ),
-    )
+$light-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$rose-palette,
+      tertiary: mat.$violet-palette,
+    ),
+  )
 );
 
-:root {
-  @include mat.all-component-themes($angular-material-3-theme);
+$dark-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: dark,
+      primary: mat.$rose-palette,
+      tertiary: mat.$violet-palette,
+    ),
+  )
+);
+
+html {
+  .light-theme {
+    @include mat.all-component-themes($light-theme);
+  }
+
+  .dark-theme {
+    @include mat.all-component-colors($dark-theme);
+    .mat-toolbar {
+      font-size: 22px; // without this, font-size goes down to 16px in dark mode
+    }
+  }
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 
+.spacer {
+  flex: 1 1 auto;
+}
+
+.no-wrap {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.error {
+  background: #fff3e0;
+  color: #d84315;
+  border-left: 4px solid #ff9800;
+  padding: 16px;
+  margin: 8px 0 16px 0;
+  border-radius: 3px;
+  font-size: 16px;
+
+  .mat-icon {
+    margin-right: 8px;
+  }
+}
+
+.is-flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-space-evenly {
+  justify-content: space-evenly;
+}
+
+.flex-space-between {
+  justify-content: space-between;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.pdfViewer .highlight {
+  background-color: rgba(186, 0, 92, 0.25) !important;
+  border-radius: 6px;
+  padding: 4px;
+  border: 1px solid black;
+}

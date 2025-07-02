@@ -1,0 +1,15 @@
+.progress-bar {
+  z-index: 100;
+  position: fixed;
+  transition: opacity 1s;
+  opacity: 1;
+  width: 100%;
+}
+
+.progress-bar.fade-out {
+  opacity: 0;
+}
+
+.progress-bar.hide {
+  display: none;
+}

@@ -1,0 +1,14 @@
+<mat-menu #contextMenu="matMenu" [hidden]="true">
+  @for (item of contextMenuItems; track item) { @if (selectedContextMenuItem &&
+  item.condition(selectedContextMenuItem)) {
+  <button mat-menu-item (click)="item.action(selectedContextMenuItem)">
+    {{ item.label }}
+  </button>
+  } }
+</mat-menu>
+
+<button
+  style="display: none"
+  #menuTrigger="matMenuTrigger"
+  [matMenuTriggerFor]="contextMenu"
+></button>

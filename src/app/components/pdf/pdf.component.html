@@ -1,0 +1,51 @@
+<div>
+  <mat-toolbar>
+    @if (doc$ | async; as doc) {
+      <h2>{{ doc.content.name }}</h2>
+    } @else {
+      <h2></h2>
+    }
+    @if ((docLoadState$ | async) == "error") {
+      <h2>Oh oh!</h2>
+    }
+    <span class="spacer"></span>
+    <button
+      type="button"
+      aria-label="Refresh"
+      matIconButton
+      (click)="refresh()"
+      [disabled]="!(isLoggedIn$ | async)"
+      matTooltip="Refresh"
+    >
+      <mat-icon aria-label="Refresh">refresh</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <div [style.height]="height">
+    @switch (docLoadState$ | async) {
+      @case ("loading") {
+        <div class="spinner-container">
+          <mat-spinner></mat-spinner>
+        </div>
+      }
+      @case ("loaded") {
+        @if (doc$ | async; as doc) {
+          <app-pdf-viewer
+            #pdfViewer
+            [base64Src]="doc.pdf"
+            [height]="height"
+            [width]="width"
+            (pdfLoaded)="pdfLoaded($event)"
+            [backgroundColor]="
+              'var(--mat-sidenav-content-background-color, var(--mat-sys-background))'
+            "
+          >
+          </app-pdf-viewer>
+        }
+      }
+      @case ("error") {
+        <div class="error">Something went wrong loading the document.</div>
+      }
+    }
+  </div>
+</div>
