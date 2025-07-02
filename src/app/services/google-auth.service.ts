@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, throwError } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { SnackService } from '../common/services/snack.service';
 
@@ -80,14 +80,15 @@ export class GoogleAuthService {
         if (response.ok) {
           console.log('Token revoked');
           gapi.client.setToken(null);
-          this.deleteCookie(this._accessTokenCookie);
-          this.deleteCookie(this._expiresAtCookie);
-          this.isLoggedInSubject.next(false);
         } else {
           console.error('Failed to revoke token');
         }
       });
     }
+
+    this.deleteCookie(this._accessTokenCookie);
+    this.deleteCookie(this._expiresAtCookie);
+    this.isLoggedInSubject.next(false);
   }
 
   getIsLoggedIn(): Observable<boolean> {
@@ -128,7 +129,7 @@ export class GoogleAuthService {
     );
   }
 
-  hasValidAccessToken(): boolean {
+  public hasValidAccessToken(): boolean {
     const accessToken = this.cookieService.get(this._accessTokenCookie);
     if (!accessToken) {
       return false;
@@ -139,6 +140,14 @@ export class GoogleAuthService {
     }
     const expiresAt = parseInt(expiresAtStr, 10);
     return Date.now() < expiresAt;
+  }
+
+  public handleError(response: any) {
+    if (response.status === 401) {
+      this.logout();
+    }
+    console.error('Error accessing Google API:', response.result.error);
+    return throwError(() => response);
   }
 
   private deleteCookie(name: string): void {

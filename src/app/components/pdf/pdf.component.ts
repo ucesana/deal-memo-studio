@@ -76,7 +76,6 @@ export class PdfComponent implements OnInit, AfterViewInit {
 
   public ngOnInit(): void {
     this.id = this._route.snapshot.paramMap.get('id');
-    console.log('id', this.id);
     if (this.id) {
       this._lastVisited.setLastPdfId(this.id);
     }

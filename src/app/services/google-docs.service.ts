@@ -46,9 +46,8 @@ export class GoogleDocsService {
           }
         },
       ),
-      catchError((error) => {
-        console.error('Error loading Google Doc:', error);
-        return throwError(() => error);
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
       }),
     );
   }

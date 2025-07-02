@@ -31,7 +31,6 @@ export class TagService {
   constructor() {}
 
   public setDocumentTags(tags: DocumentTagData): void {
-    console.log('tags', tags);
     this._documentTagsSubject.next(tags);
   }
 

@@ -1,15 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import {
-  BehaviorSubject,
   catchError,
-  filter,
   from,
   Observable,
-  of,
-  Subject,
   switchMap,
-  throwError,
   take,
+  throwError,
 } from 'rxjs';
 import { GoogleAuthService } from './google-auth.service';
 import { Sheet, Spreadsheet } from '../models/spreadsheet';
@@ -55,27 +51,23 @@ export class GoogleSheetsService {
   getSpreadsheet(
     spreadsheetId: string,
   ): Observable<gapi.client.sheets.Spreadsheet> {
-    return new Observable((observer) => {
-      this.loadSheetsApi().subscribe({
-        next: () => {
-          gapi.client.sheets.spreadsheets
-            .get({
-              spreadsheetId,
-              includeGridData: true,
-            })
-            .then((response: any) => {
-              observer.next(response.result);
-              observer.complete();
-            })
-            .catch((error: any) => {
-              observer.error(error);
-            });
-        },
-        error: (apiError) => {
-          observer.error(apiError);
-        },
-      });
-    });
+    return this.loadSheetsApi().pipe(
+      switchMap((_) =>
+        from(
+          gapi.client.sheets.spreadsheets.get({
+            spreadsheetId,
+            includeGridData: true,
+          }) as Observable<
+            gapi.client.Response<gapi.client.sheets.Spreadsheet>
+          >,
+        ),
+      ),
+      take(1),
+      map((response) => response.result),
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
+      }),
+    );
   }
 
   createSpreadsheet(
@@ -95,6 +87,9 @@ export class GoogleSheetsService {
         (response: gapi.client.Response<gapi.client.sheets.Spreadsheet>) =>
           response.result,
       ),
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
+      }),
     );
   }
 

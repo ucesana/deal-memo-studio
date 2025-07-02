@@ -71,13 +71,7 @@ export class GoogleDriveService {
         return result;
       }),
     ).pipe(
-      catchError((error) =>
-        throwError(() => {
-          console.error('Error loading Google Drive API:', error);
-
-          throwError(() => error);
-        }),
-      ),
+      catchError((response) => this.googleAuthService.handleError(response)),
     );
   }
 
@@ -100,9 +94,8 @@ export class GoogleDriveService {
       ),
       take(1),
       map((response) => response.result.files),
-      catchError((error) => {
-        console.error('Error listing Google Docs:', error);
-        return throwError(() => error);
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
       }),
     );
   }
@@ -111,10 +104,10 @@ export class GoogleDriveService {
     this.listFiles(query)
       .pipe(
         take(1),
-        catchError((error) => {
-          this.snackService.openSnackBar(error);
+        catchError((response) => {
+          this.snackService.openSnackBar(response.result.error);
           this.listFilesSubject.next([]);
-          return throwError(() => error);
+          return this.googleAuthService.handleError(response);
         }),
       )
       .subscribe((files: gapi.client.drive.File[]) => {
@@ -144,30 +137,12 @@ export class GoogleDriveService {
     return parts.join(' and ');
   }
 
-  listDrives() {
-    this.loadDriveApi().subscribe((res) => {
-      gapi.client.drive.drives
-        .list({
-          pageSize: 100,
-        })
-        .then((res: { result: { drives: any } }) => {
-          const drives = res.result.drives;
-          console.log(drives);
-        });
-    });
-  }
-
-  searchInNames(names: string[]): { q: string } {
-    return { q: this.driveSearchQuery({ names }) };
-  }
-
   exportFileAsBinary(fileId: string) {
     const accessToken = gapi.auth.getToken().access_token;
     const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
     const headers = new HttpHeaders({
       Authorization: `Bearer ${accessToken}`,
     });
-    // set responseType to 'blob' to get binary data
     return this.http.get(url, { headers, responseType: 'blob' });
   }
 
@@ -178,22 +153,6 @@ export class GoogleDriveService {
           gapi.client.drive.files.export({
             fileId,
             mimeType: 'text/plain',
-          }) as Observable<gapi.client.Response<string>>,
-        ),
-      ),
-      take(1),
-      map((response) => response.body),
-    );
-  }
-
-  exportFileAsHtml(fileId: string): Observable<string> {
-    return this.loadDriveApi().pipe(
-      switchMap(() =>
-        from(
-          gapi.client.drive.files.export({
-            fileId,
-            mimeType: 'text/html',
-            // @ts-ignore
           }) as Observable<gapi.client.Response<string>>,
         ),
       ),
@@ -245,9 +204,8 @@ export class GoogleDriveService {
       map((response: gapi.client.Response<gapi.client.drive.File>) =>
         JSON.parse(response.body),
       ),
-      catchError((error) => {
-        console.error('Error getting Google Drive File:', error);
-        return throwError(() => error);
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
       }),
     );
   }
@@ -270,17 +228,10 @@ export class GoogleDriveService {
           }),
         ),
       ),
+      take(1),
       map((response: any) => response.result.files),
-    );
-  }
-
-  findFileIdByName(folderName: string): Observable<string | null> {
-    return this.findFileByName(
-      folderName,
-      'application/vnd.google-apps.folder',
-    ).pipe(
-      map((files: gapi.client.drive.File[]) => {
-        return files?.[0]?.id || null;
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
       }),
     );
   }
@@ -311,6 +262,9 @@ export class GoogleDriveService {
       ),
       take(1),
       map((res) => res.result.files?.[0]?.id || null),
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
+      }),
     );
   }
 
@@ -330,6 +284,9 @@ export class GoogleDriveService {
       ),
       take(1),
       map((res) => res.result.id ?? ''),
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
+      }),
     );
   }
 
@@ -409,6 +366,9 @@ export class GoogleDriveService {
           ),
         ),
       ),
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
+      }),
     );
   }
 
@@ -443,9 +403,8 @@ export class GoogleDriveService {
           { headers },
         );
       }),
-      catchError((error) => {
-        console.error('Error uploading PDF to Google Drive:', error);
-        return throwError(() => error);
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
       }),
     );
   }
@@ -459,9 +418,8 @@ export class GoogleDriveService {
       switchMap((pdfBlob: Blob) => {
         return this.uploadPdf(pdfBlob, fileName, parentId);
       }),
-      catchError((error) => {
-        console.error('Error saving Google Doc as PDF:', error);
-        return throwError(() => error);
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
       }),
     );
   }
@@ -523,9 +481,8 @@ export class GoogleDriveService {
           })
           .pipe(switchMap((blob: Blob) => of({ file: fileInfo, blob })));
       }),
-      catchError((error) => {
-        console.error('Error fetching PDF:', error);
-        return throwError(() => error);
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
       }),
     );
   }

@@ -2,9 +2,12 @@ import { inject, Injectable } from '@angular/core';
 import { GoogleDriveService } from './google-drive.service';
 import {
   BehaviorSubject,
+  catchError,
   finalize,
   forkJoin,
+  from,
   Observable,
+  of,
   Subject,
   switchMap,
   tap,
@@ -13,6 +16,7 @@ import { GoogleSheetsService } from './google-sheets.service';
 import { Spreadsheet } from '../models/spreadsheet';
 import { filter, map, take } from 'rxjs/operators';
 import { ProgressWatcher } from '../common/classes/progress-watcher';
+import { GoogleAuthService } from './google-auth.service';
 
 export interface AppFile {
   id: string;
@@ -60,6 +64,7 @@ export class DealMemoService {
 
   private readonly googleDriveService = inject(GoogleDriveService);
   private readonly googleSheetsService = inject(GoogleSheetsService);
+  private readonly googleAuthService = inject(GoogleAuthService);
 
   private readonly appFileStructureSubject: Subject<AppFileStructure | null> =
     new BehaviorSubject<AppFileStructure | null>(null);
@@ -186,9 +191,12 @@ export class DealMemoService {
               .pipe(tap((_) => this.appLoadProgressStepper.success())),
           ]);
         }),
+        catchError((response) => {
+          return this.googleAuthService.handleError(response);
+        }),
         finalize(() => this.appLoadProgressStepper.done()),
       )
-      .subscribe(([appDataFile, userDataFile]) => {});
+      .subscribe((_) => {});
   }
 
   private getOrCreateSpreadsheet(
@@ -241,23 +249,6 @@ export class DealMemoService {
         {
           title: 'Agent',
           data: [['Name', 'Agency Name']],
-        },
-        {
-          title: 'Deal Memo Jobs',
-          data: [
-            [
-              'Name',
-              'Datetime',
-              'Status',
-              'Total',
-              'Completed',
-              'Failures',
-              'Completed Datetime',
-              'Folder Id',
-              'Folder Name',
-              'Log File Id',
-            ],
-          ],
         },
       ],
     };

@@ -161,14 +161,12 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
     //   this._dealMemosProgressWatcher.destroy();
     // }
     const reuseRoute = this._route.snapshot.data['reuseRoute'];
-    console.log('ngOnDestroy::reuseRoute', reuseRoute);
     if (reuseRoute) {
       this.storeState();
     }
   }
 
   public initState(): void {
-    console.log('initState');
     this._dealMemosProgressWatcher.reset();
     this.stepper.reset();
     this.selectedTemplate = null;
@@ -186,10 +184,6 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public storeState(): void {
-    console.log(
-      'storeState::this.stepper.selectedIndex',
-      this.stepper.selectedIndex,
-    );
     const currentState = {
       selectedTemplate: this.selectedTemplate,
       selectedTagData: this.selectedTagData,
@@ -205,10 +199,6 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private restoreComponentState(state: any): void {
-    console.log(
-      'restoreComponentState::state.selectedIndex',
-      state.selectedIndex,
-    );
     this.stepper.reset();
     this.selectedTemplate = state.selectedTemplate;
     this.selectedTagData = state.selectedTagData;

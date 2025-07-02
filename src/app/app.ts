@@ -52,6 +52,8 @@ export class App implements OnInit {
     this._googleAuthService.getIsLoggedIn().subscribe((isLoggedIn) => {
       if (isLoggedIn) {
         this._dealMemoService.loadOrCreateAppData();
+      } else {
+        this._router.navigate(['/welcome']).then();
       }
     });
   }

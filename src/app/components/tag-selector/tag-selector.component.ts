@@ -25,16 +25,9 @@ export class TagSelectorComponent {
   public spreadsheet$: Observable<gapi.client.sheets.Spreadsheet>;
 
   constructor(private readonly dealMemoService: DealMemoService) {
-    this.spreadsheet$ = this.dealMemoService.getUserDataSpreadsheet().pipe(
-      filter((o) => !!o),
-      map((spreadsheet) => {
-        spreadsheet.sheets =
-          spreadsheet.sheets?.filter(
-            (s) => s.properties?.title !== 'Deal Memo Job',
-          ) ?? [];
-        return spreadsheet;
-      }),
-    );
+    this.spreadsheet$ = this.dealMemoService
+      .getUserDataSpreadsheet()
+      .pipe(filter((o) => !!o));
   }
 
   public selectSheets(sheetSelection: SheetTableItemSelection): void {

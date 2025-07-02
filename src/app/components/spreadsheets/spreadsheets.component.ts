@@ -59,13 +59,9 @@ export class SpreadsheetsComponent implements OnInit, AfterViewInit {
       });
   }
 
-  public selectSheets(sheetSelection: SheetTableItemSelection): void {
-    console.log('selectSheets', sheetSelection);
-  }
+  public selectSheets(sheetSelection: SheetTableItemSelection): void {}
 
-  public selectTagData(tagData: DocumentTagData): void {
-    console.log('selectTagData', tagData);
-  }
+  public selectTagData(tagData: DocumentTagData): void {}
 
   public loadSpreadsheet(id: string): void {
     this.googleSheetsService
@@ -73,13 +69,6 @@ export class SpreadsheetsComponent implements OnInit, AfterViewInit {
       .pipe(
         take(1),
         filter((o) => !!o),
-        map((spreadsheet) => {
-          spreadsheet.sheets =
-            spreadsheet.sheets?.filter(
-              (s) => s.properties?.title !== 'Deal Memo Job',
-            ) ?? [];
-          return spreadsheet;
-        }),
       )
       .subscribe((spreadsheet) => {
         this._spreadsheetSubject.next(spreadsheet);
