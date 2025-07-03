@@ -201,6 +201,7 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
     this.stepper.reset();
     this.selectedTemplate = null;
     this.selectedTagData = null;
+    this.selectedSpreadsheetId = null;
     this.reviewFormGroup.reset();
     this.isCreating = false;
     this.destinationFolder = [];
@@ -217,6 +218,7 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
     const currentState = {
       selectedTemplate: this.selectedTemplate,
       selectedTagData: this.selectedTagData,
+      selectedSpreadsheetId: this.selectedSpreadsheetId,
       reviewFormGroup: this.reviewFormGroup.value,
       isCreating: this.isCreating,
       destinationFolder: this.destinationFolder,
@@ -232,6 +234,7 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
     this.stepper.reset();
     this.selectedTemplate = state.selectedTemplate;
     this.selectedTagData = state.selectedTagData;
+    this.selectedSpreadsheetId = state.selectedSpreadsheetId;
     this.reviewFormGroup.patchValue(state.reviewFormGroup);
     this.isCreating = state.isCreating;
     this.destinationFolder = state.destinationFolder;
