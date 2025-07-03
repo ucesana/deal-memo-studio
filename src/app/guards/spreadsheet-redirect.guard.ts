@@ -12,9 +12,9 @@ export class SpreadsheetRedirectGuard implements CanActivate {
   canActivate(): boolean {
     const lastId = this.lastVisited.getLastSpreadsheetId();
     if (lastId) {
-      this.router.navigate(['/spreadsheets', lastId]);
+      this.router.navigate(['/dashboard/spreadsheets', lastId]);
     } else {
-      this.router.navigate(['/missing-document']);
+      this.router.navigate(['/dashboard/missing-document']);
     }
     return false;
   }

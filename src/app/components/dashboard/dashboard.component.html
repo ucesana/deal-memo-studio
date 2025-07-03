@@ -1,0 +1,44 @@
+<app-progress-bar [progress]="appLoadProgress$ | async"></app-progress-bar>
+<app-main-toolbar [drawer]="drawer"></app-main-toolbar>
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false"
+  >
+    <mat-nav-list>
+      @for (item of menuRoutes; track $index) {
+        <a
+          mat-list-item
+          [routerLink]="item.path"
+          #link="routerLinkActive"
+          routerLinkActive
+          [activated]="link.isActive"
+        >
+          {{ item.title }}
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div class="sidenav-scroll-wrapper">
+      <div class="sidenav-content">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+<button
+  matFab
+  color="primary"
+  class="fab-create"
+  aria-label="Start creating deal memos"
+  (click)="createNewDealMemos()"
+  matTooltip="Start creating deal memos"
+  matTooltipPosition="left"
+>
+  <mat-icon>create</mat-icon>
+</button>

@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, Input, ViewChild } from '@angular/core';
 import {
   DriveTreeComponent,
   FlatTreeNode,
@@ -10,11 +10,6 @@ import {
   GoogleDriveService,
 } from '../../services/google-drive.service';
 import { ContextMenuItem } from '../../common/components/context-menu/context-menu';
-import { MatDialog } from '@angular/material/dialog';
-import { SpinnerDialog } from '../../common/components/spinner-dialog/spinner-dialog';
-import { Observable } from 'rxjs';
-import { MatTable } from '@angular/material/table';
-import { TableItem } from '../sheet-tab/table-datasource';
 import { DriveContextMenuService } from '../../services/drive-context-menu.service';
 
 @Component({
@@ -31,6 +26,8 @@ export class DriveComponent {
   private readonly _googleDriveService = inject(GoogleDriveService);
   private readonly _driveContextMenuService = inject(DriveContextMenuService);
 
+  public readonly parentId: string = 'root';
+
   public contextMenuItems: ContextMenuItem[] = [];
   public searchQuery: DriveSearchQuery = {
     mimeTypes: [
@@ -42,13 +39,12 @@ export class DriveComponent {
       'application/pdf',
     ],
   };
-  public parentId: string = 'root';
 
   constructor() {
     this.contextMenuItems = [
       this._driveContextMenuService.openInGoogleDrive(),
       this._driveContextMenuService.saveAsGoogleDoc((file) =>
-        this._router.navigate(['/docs', file.id]),
+        this._router.navigate(['/dashboard/docs', file.id]),
       ),
     ];
   }
@@ -62,7 +58,7 @@ export class DriveComponent {
           () =>
             this._driveContextMenuService
               .saveAsGoogleDoc((file) =>
-                this._router.navigate(['/docs', file.id]),
+                this._router.navigate(['/dashboard/docs', file.id]),
               )
               .action(node),
         );

@@ -25,16 +25,15 @@ export class DriveContextMenuService {
   public readonly openFileAction = (node: FileNode) => {
     switch (node.mimeType) {
       case 'application/vnd.google-apps.document':
-        this._router.navigate(['/docs', node.id]).then((_) => {});
+        this._router.navigate(['/dashboard/docs', node.id]).then((_) => {});
         break;
       case 'application/vnd.google-apps.spreadsheet':
-        this._router.navigate(['/spreadsheets', node.id]).then((_) => {});
+        this._router
+          .navigate(['/dashboard/spreadsheets', node.id])
+          .then((_) => {});
         break;
       case 'application/pdf':
-        this._router.navigate(['/pdf', node.id]).then((_) => {});
-        break;
-      case 'application/vnd.google-apps.folder':
-        this._router.navigate(['/drive', node.id]).then((_) => {});
+        this._router.navigate(['/dashboard/pdf', node.id]).then((_) => {});
         break;
     }
   };

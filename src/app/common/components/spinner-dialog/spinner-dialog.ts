@@ -5,6 +5,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-spinner-dialog',

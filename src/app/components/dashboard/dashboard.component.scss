@@ -1,12 +1,5 @@
-@import url("https://fonts.googleapis.com/css?family=Satisfy&display=swap");
-
-.title {
-  font-family: "Satisfy", cursive;
-}
-
 mat-sidenav {
   width: 200px;
-  padding: 8px;
 }
 
 .sidenav-content {
@@ -16,4 +9,11 @@ mat-sidenav {
 
 ::ng-deep mat-chip {
   background-color: rgba(186, 0, 92, 0.25) !important;
+}
+
+.fab-create {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 1000;
 }

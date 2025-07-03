@@ -1,0 +1,30 @@
+div.welcome-title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 64px;
+
+  h1.welcome-title {
+    font-family: "Satisfy", cursive;
+    color: var(
+      --mat-stepper-header-selected-state-icon-background-color,
+      var(--mat-sys-primary)
+    ) !important;
+    font-size: 3rem;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  .welcome-subtitle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: var(--mat-toolbar-container-text-color, var(--mat-sys-on-surface));
+  }
+
+  ul li {
+    padding-bottom: 12px;
+  }
+}

@@ -136,7 +136,7 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
       this._driveContextMenuService.openFile(),
       this._driveContextMenuService.openInGoogleDrive(),
       this._driveContextMenuService.saveAsGoogleDoc((file) =>
-        this._router.navigate(['/docs', file.id]),
+        this._router.navigate(['/dashboard/docs', file.id]),
       ),
     ];
   }

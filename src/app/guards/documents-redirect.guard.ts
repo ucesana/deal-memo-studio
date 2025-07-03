@@ -12,9 +12,9 @@ export class EditorRedirectGuard implements CanActivate {
   canActivate(): boolean {
     const lastId = this.lastVisited.getLastEditorId();
     if (lastId) {
-      this.router.navigate(['/docs', lastId]);
+      this.router.navigate(['/dashboard/docs', lastId]);
     } else {
-      this.router.navigate(['/missing-document']);
+      this.router.navigate(['/dashboard/missing-document']);
     }
     return false;
   }

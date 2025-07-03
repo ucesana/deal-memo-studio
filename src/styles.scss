@@ -1,5 +1,7 @@
 @use "@angular/material" as mat;
 
+@import url("https://fonts.googleapis.com/css?family=Satisfy&display=swap");
+
 @include mat.core();
 
 $light-theme: mat.define-theme(
@@ -42,6 +44,26 @@ body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: var(
+    --mat-stepper-header-selected-state-icon-background-color,
+    var(--mat-sys-primary)
+  ) !important;
+
+  &:visited {
+    color: inherit;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &:focus {
+    text-decoration: none;
+  }
 }
 
 .spacer {

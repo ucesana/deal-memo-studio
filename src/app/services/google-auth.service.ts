@@ -15,15 +15,15 @@ const SCOPES =
   providedIn: 'root',
 })
 export class GoogleAuthService {
-  private readonly cookieService = inject(CookieService);
-  private readonly snackService = inject(SnackService);
+  private readonly _cookieService = inject(CookieService);
+  private readonly _snackService = inject(SnackService);
+  private readonly _path: string = '/';
+  private readonly _accessTokenCookie = 'access_token';
+  private readonly _expiresAtCookie = 'expires_at';
 
   readonly isLoggedInSubject: Subject<boolean> = new BehaviorSubject(false);
 
   constructor() {}
-
-  private readonly _accessTokenCookie = 'access_token';
-  private readonly _expiresAtCookie = 'expires_at';
 
   login() {
     // @ts-ignore
@@ -33,10 +33,15 @@ export class GoogleAuthService {
         scope: SCOPES,
         callback: (tokenResponse: any) => {
           gapi.load('client', () => {
-            this.setCookie(this._accessTokenCookie, tokenResponse.access_token);
+            this.setCookie(
+              this._accessTokenCookie,
+              tokenResponse.access_token,
+              this._path,
+            );
             this.setCookie(
               this._expiresAtCookie,
               this.expiresAt(tokenResponse.expires_in),
+              this._path,
             );
             gapi.client.setToken({
               access_token: tokenResponse.access_token,
@@ -48,9 +53,9 @@ export class GoogleAuthService {
       .requestAccessToken();
   }
 
-  private setCookie(name: string, value: string): void {
-    this.cookieService.set(name, value, {
-      path: '/',
+  private setCookie(name: string, value: string, path = '/'): void {
+    this._cookieService.set(name, value, {
+      path: path,
       sameSite: 'Strict',
       secure: false,
     });
@@ -96,50 +101,59 @@ export class GoogleAuthService {
   }
 
   initAccessToken(): void {
-    const accessToken = this.cookieService.get(this._accessTokenCookie);
+    const accessToken = this._cookieService.get(this._accessTokenCookie);
     if (!accessToken) {
       this.isLoggedInSubject.next(false);
       return;
     }
-    const expiresAtStr = this.cookieService.get(this._expiresAtCookie);
+
+    const expiresAtStr = this._cookieService.get(this._expiresAtCookie);
     if (!expiresAtStr?.length) {
       this.isLoggedInSubject.next(false);
       return;
     }
     const expiresAt = parseInt(expiresAtStr, 10);
+    const hasExpired = Date.now() > expiresAt;
 
-    if (accessToken && expiresAt && Date.now() < expiresAt) {
+    if (hasExpired) {
+      this.isLoggedInSubject.next(false);
+      this.openLoginSnack();
+    } else {
       gapi.load('client', () => {
         gapi.client.setToken({
           access_token: accessToken,
         });
         this.isLoggedInSubject.next(true);
       });
-    } else {
-      this.isLoggedInSubject.next(false);
-      this.openLoginSnack();
     }
   }
 
   public openLoginSnack() {
-    this.snackService.openSnackBar(
-      'Your session has expired. Please login again.',
-      'Login',
-      () => this.login(),
+    this._snackService.openSnackBar('Your session has expired.', 'Login', () =>
+      this.login(),
     );
   }
 
-  public hasValidAccessToken(): boolean {
-    const accessToken = this.cookieService.get(this._accessTokenCookie);
+  public hasStoredAccessToken(): boolean {
+    const accessToken = this._cookieService.get(this._accessTokenCookie);
+    return !!accessToken && accessToken.length > 0;
+  }
+
+  public isAccessTokenNotExpired(): boolean {
+    const accessToken = this._cookieService.get(this._accessTokenCookie);
     if (!accessToken) {
       return false;
     }
-    const expiresAtStr = this.cookieService.get(this._expiresAtCookie);
+    const expiresAtStr = this._cookieService.get(this._expiresAtCookie);
     if (!expiresAtStr?.length) {
       return false;
     }
     const expiresAt = parseInt(expiresAtStr, 10);
     return Date.now() < expiresAt;
+  }
+
+  public isAccessTokenExpired() {
+    return !this.isAccessTokenNotExpired();
   }
 
   public handleError(response: any) {
@@ -150,7 +164,18 @@ export class GoogleAuthService {
     return throwError(() => response);
   }
 
+  public waitForGapi(): Promise<void> {
+    return new Promise((resolve) => {
+      if ((window as any).gapi) return resolve();
+      const check = () => {
+        if ((window as any).gapi) resolve();
+        else setTimeout(check, 50);
+      };
+      check();
+    });
+  }
+
   private deleteCookie(name: string): void {
-    this.cookieService.delete(name, '/', undefined, false, 'Strict');
+    this._cookieService.delete(name, '/', undefined, false, 'Strict');
   }
 }

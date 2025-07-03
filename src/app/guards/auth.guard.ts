@@ -13,12 +13,6 @@ export class AuthGuard implements CanActivate {
   constructor() {}
 
   canActivate(): boolean {
-    const authenticated = this.googleAuthService.isAuthenticated();
-    if (!authenticated) {
-      this.router
-        .navigate(['/welcome'])
-        .then((_) => this.googleAuthService.openLoginSnack());
-    }
-    return authenticated;
+    return this.googleAuthService.isAuthenticated();
   }
 }

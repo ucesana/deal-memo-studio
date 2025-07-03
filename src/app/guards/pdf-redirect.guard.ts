@@ -12,9 +12,9 @@ export class PdfRedirectGuard implements CanActivate {
   canActivate(): boolean {
     const lastId = this.lastVisited.getLastPdfId();
     if (lastId) {
-      this.router.navigate(['/pdf', lastId]);
+      this.router.navigate(['/dashboard/pdf', lastId]);
     } else {
-      this.router.navigate(['/missing-document']);
+      this.router.navigate(['/dashboard/missing-document']);
     }
     return false;
   }
