@@ -36,8 +36,11 @@ import {
   DealMemoService,
 } from '../../services/deal-memo.service';
 import { filter, map, take } from 'rxjs/operators';
-import { GoogleDriveService } from '../../services/google-drive.service';
-import { Observable, switchMap, tap } from 'rxjs';
+import {
+  DriveSearchQuery,
+  GoogleDriveService,
+} from '../../services/google-drive.service';
+import { BehaviorSubject, Observable, Subject, switchMap, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import {
@@ -99,9 +102,27 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
   private readonly _router = inject(Router);
   private readonly _driveContextMenuService = inject(DriveContextMenuService);
 
-  private _dealMemosProgressWatcher = new ProgressWatcher<
+  private readonly _dealMemosProgressWatcher = new ProgressWatcher<
     RequestResult<SimpleGoogleFile>
   >();
+  private readonly _selectedSpreadsheetIdSubject: Subject<string | null> =
+    new BehaviorSubject<string | null>(null);
+
+  public readonly templateSearchQuery: DriveSearchQuery = {
+    mimeTypes: [
+      'application/vnd.google-apps.folder',
+      'application/vnd.google-apps.document',
+      'application/vnd.oasis.opendocument.text',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ],
+  };
+
+  public readonly spreadsheetSearchQuery: DriveSearchQuery = {
+    mimeTypes: [
+      'application/vnd.google-apps.folder',
+      'application/vnd.google-apps.spreadsheet',
+    ],
+  };
 
   public progress$: Observable<Progress<RequestResult<SimpleGoogleFile>>> =
     this._dealMemosProgressWatcher.getProgress$();
@@ -118,6 +139,7 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
   public dealMemoPdfs: SimpleGoogleFile[] = [];
   public isCreating: boolean = false;
   public driveListContextMenuItems: ContextMenuItem[] = [];
+  public selectedSpreadsheetId: string | null = null;
 
   constructor() {
     this.progress$
@@ -139,6 +161,14 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
         this._router.navigate(['/dashboard/docs', file.id]),
       ),
     ];
+
+    this._dealMemoService
+      .getAppFileStructure()
+      .subscribe((appFileStructure) => {
+        this._selectedSpreadsheetIdSubject.next(
+          appFileStructure.userDataFile.id,
+        );
+      });
   }
 
   ngOnInit() {}
@@ -211,7 +241,7 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
     this.stepper.selectedIndex = state.selectedIndex;
   }
 
-  public selectedFile(file: gapi.client.drive.File): void {
+  public selectTemplate(file: gapi.client.drive.File): void {
     this.selectedTemplate = file;
     this.selectedTagData = null;
   }
@@ -366,5 +396,9 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
     const ext = extParts.length ? '.' + extParts.join('.') : '';
 
     return `${name}_${date}_${time}${ext}`;
+  }
+
+  selectedSpreadsheet(file: gapi.client.drive.File): void {
+    this.selectedSpreadsheetId = file.id ?? '';
   }
 }

@@ -1,13 +1,23 @@
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import {
   SheetTableItemSelection,
   SpreadsheetTableComponent,
 } from '../spreadsheet-table/spreadsheet-table.component';
 import { AsyncPipe } from '@angular/common';
 import { DocumentTagData } from '../../services/tag.service';
-import { filter, Observable } from 'rxjs';
+import { BehaviorSubject, filter, Observable, Subject } from 'rxjs';
 import { DealMemoService } from '../../services/deal-memo.service';
 import { map } from 'rxjs/operators';
+import { GoogleSheetsService } from '../../services/google-sheets.service';
+import { Spreadsheet } from '../../models/spreadsheet';
 
 @Component({
   selector: 'app-tag-selector',
@@ -15,19 +25,32 @@ import { map } from 'rxjs/operators';
   templateUrl: './tag-selector.component.html',
   styleUrl: './tag-selector.component.scss',
 })
-export class TagSelectorComponent {
+export class TagSelectorComponent implements OnInit {
+  @Input() fileId = '';
   @Output() sheetSelection: EventEmitter<SheetTableItemSelection> =
     new EventEmitter();
   @Output() tagData: EventEmitter<DocumentTagData> = new EventEmitter();
 
   @ViewChild('spreadsheetTable') spreadsheetTable?: SpreadsheetTableComponent;
 
-  public spreadsheet$: Observable<gapi.client.sheets.Spreadsheet>;
+  public fileSubject: Subject<gapi.client.sheets.Spreadsheet | null> =
+    new BehaviorSubject<gapi.client.sheets.Spreadsheet | null>(null);
+  public file$: Observable<gapi.client.sheets.Spreadsheet | null> =
+    this.fileSubject.asObservable();
 
-  constructor(private readonly dealMemoService: DealMemoService) {
-    this.spreadsheet$ = this.dealMemoService
-      .getUserDataSpreadsheet()
-      .pipe(filter((o) => !!o));
+  private readonly _googleSheetsService = inject(GoogleSheetsService);
+  private readonly _dealMemoService: DealMemoService = inject(DealMemoService);
+
+  ngOnInit(): void {
+    this.load(this.fileId);
+  }
+
+  private load(fileId: string) {
+    this._googleSheetsService
+      .getSpreadsheet(fileId)
+      .subscribe((spreadsheet) => {
+        this.fileSubject.next(spreadsheet);
+      });
   }
 
   public selectSheets(sheetSelection: SheetTableItemSelection): void {
@@ -38,11 +61,7 @@ export class TagSelectorComponent {
     this.tagData.emit(tagData);
   }
 
-  public reload(): void {
-    this.dealMemoService.loadUserData();
-  }
-
   public refresh(): void {
-    this.spreadsheetTable?.refresh();
+    this.load(this.fileId);
   }
 }

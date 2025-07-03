@@ -291,11 +291,13 @@ export class DocumentsComponent implements OnInit, AfterViewInit {
   }
 
   public clearHighlights() {
-    this.pdfViewer.setSearchText('');
+    if (this.pdfViewer) {
+      this.pdfViewer.setSearchText('');
+    }
   }
 
   public highlightTags() {
-    if (this.tags) {
+    if (this.tags && this.pdfViewer) {
       this.pdfViewer.setSearchText(this.tags.map((tag) => `<<${tag}>>`));
     }
   }

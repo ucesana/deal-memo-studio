@@ -36,19 +36,11 @@ export class DriveSelectorComponent {
   private readonly _snackService: SnackService = inject(SnackService);
 
   @Input() public parentId: string = 'root';
+  @Input() public searchQuery: DriveSearchQuery = {};
   @Output() public selectedFile: EventEmitter<gapi.client.drive.File> =
     new EventEmitter();
 
   @ViewChild(DriveTreeComponent) public driveTree!: DriveTreeComponent;
-
-  public searchQuery: DriveSearchQuery = {
-    mimeTypes: [
-      'application/vnd.google-apps.folder',
-      'application/vnd.google-apps.document',
-      'application/vnd.oasis.opendocument.text',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    ],
-  };
 
   public contextMenuItems: ContextMenuItem[] = [];
 
@@ -64,6 +56,9 @@ export class DriveSelectorComponent {
   public select(node: FlatTreeNode): void {
     switch (node.mimeType) {
       case 'application/vnd.google-apps.document':
+        this.selectedFile.emit(node.file);
+        break;
+      case 'application/vnd.google-apps.spreadsheet':
         this.selectedFile.emit(node.file);
         break;
       case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':

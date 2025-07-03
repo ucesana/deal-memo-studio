@@ -5,7 +5,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { DocumentTagData } from '../../services/tag.service';
+import {
+  DocumentTagData,
+  TagData as TagDataType,
+} from '../../services/tag.service';
 import { MatChip } from '@angular/material/chips';
 import { MatTooltip } from '@angular/material/tooltip';
 import { TagValuePipe } from '../../pipes/tag-value-pipe';
@@ -30,7 +33,13 @@ export class TagData implements OnInit {
   @Input() data!: DocumentTagData;
   accordion = viewChild.required(MatAccordion);
 
-  constructor() {}
+  public tagData: TagDataType = [];
+
+  constructor() {
+    if (this.data?.length) {
+      this.tagData = this.data[0] || [];
+    }
+  }
 
   ngOnInit(): void {}
 }

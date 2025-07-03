@@ -1,8 +1,10 @@
-<app-spreadsheet-table
-  #spreadsheetTable
-  [spreadsheet]="spreadsheet$ | async"
-  (sheetsSelection)="selectSheets($event)"
-  (tagData)="selectTagData($event)"
-  (reload)="reload()"
-  [height]="'calc(100vh - 64px - 32px - 72px - 64px - 56px)'"
-></app-spreadsheet-table>
+@if (file$ | async; as file) {
+  <app-spreadsheet-table
+    #spreadsheetTable
+    [spreadsheet]="file"
+    (sheetsSelection)="selectSheets($event)"
+    (tagData)="selectTagData($event)"
+    (reload)="refresh()"
+    [height]="'calc(100vh - 64px - 32px - 72px - 64px - 56px)'"
+  ></app-spreadsheet-table>
+}

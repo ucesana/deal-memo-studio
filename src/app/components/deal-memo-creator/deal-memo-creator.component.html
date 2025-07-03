@@ -11,7 +11,8 @@
     } @else {
       <app-drive-selector
         [parentId]="'root'"
-        (selectedFile)="selectedFile($event)"
+        [searchQuery]="templateSearchQuery"
+        (selectedFile)="selectTemplate($event)"
       ></app-drive-selector>
     }
     <div class="button-container">
@@ -29,13 +30,28 @@
       </button>
     </div>
   </mat-step>
-  <mat-step [label]="'Select Tags'" [completed]="!!selectedTagData?.length">
-    <app-tag-selector
-      #tagSelector
-      (sheetSelection)="selectSheets($event)"
-      (tagData)="selectTagData($event)"
-    ></app-tag-selector>
+  <mat-step [label]="'Select Data'" [completed]="!!selectedTagData?.length">
+    <!--    @if (selectedSpreadsheetId$ | async; as selectedSpreadsheetId) {-->
+    @if (selectedSpreadsheetId) {
+      <app-tag-selector
+        #tagSelector
+        [fileId]="selectedSpreadsheetId"
+        (sheetSelection)="selectSheets($event)"
+        (tagData)="selectTagData($event)"
+      ></app-tag-selector>
+    } @else {
+      <app-drive-selector
+        [parentId]="'root'"
+        [searchQuery]="spreadsheetSearchQuery"
+        (selectedFile)="selectedSpreadsheet($event)"
+      ></app-drive-selector>
+    }
     <div class="button-container">
+      @if (!!selectedSpreadsheetId) {
+        <button matButton="elevated" (click)="selectedSpreadsheetId = null">
+          Select new spreadsheet
+        </button>
+      }
       <button matButton="elevated" (click)="cancel()">Cancel</button>
       <button matButton="elevated" matStepperPrevious>Back</button>
       <button

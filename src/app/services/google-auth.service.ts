@@ -139,14 +139,15 @@ export class GoogleAuthService {
     return !!accessToken && accessToken.length > 0;
   }
 
+  public hasStoredExpiresAt(): boolean {
+    const expiresAt = this._cookieService.get(this._expiresAtCookie);
+    return !!expiresAt && expiresAt.length > 0;
+  }
+
   public isAccessTokenNotExpired(): boolean {
-    const accessToken = this._cookieService.get(this._accessTokenCookie);
-    if (!accessToken) {
-      return false;
-    }
     const expiresAtStr = this._cookieService.get(this._expiresAtCookie);
     if (!expiresAtStr?.length) {
-      return false;
+      return true;
     }
     const expiresAt = parseInt(expiresAtStr, 10);
     return Date.now() < expiresAt;

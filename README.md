@@ -62,18 +62,19 @@ First add angular-cli-ghpages to your project:
 ng add angular-cli-ghpages
 ```
 
-Copy index.html to 404.html:
-
-```bash
-cp dist/deal-memo-studio/browser/index.html dist/deal-memo-studio/browser/404.html`
-
 Then build your project for production:
 
 ```bash
-ng deploy --base-href=/deal-memo 
+ng deploy --base-href=/deal-memo-studio/ 
 ```
 
-Open your browser and navigate to `https://<your-github-username>.github.io/deal-memo/` to see your deployed application.
+or:
+
+```bash
+ng deploy --dir=dist/deal-memo/browser --base-href=/deal-memo-studio/
+```
+
+Open your browser and navigate to `https://<your-github-username>.github.io/deal-memo-studio/` to see your deployed application.
 
 ## To undeploy from GitHub Pages
 
@@ -90,3 +91,6 @@ git push origin --delete gh-pages
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+ng deploy --dir=dist/deal-memo/browser --base-href=/deal-memo-studio/

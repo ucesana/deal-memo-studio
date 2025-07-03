@@ -1,10 +1,10 @@
 <div class="tag-data-container">
-  @if (data[0] && data[0].length === 0) {
+  @if (tagData.length === 0) {
   <p>Select rows to preview the deal memos you can generate.</p>
   } @else {
 
   <p>
-    Selected {{ data[0].length }} tags for {{ data.length }} Deal Memo{{
+    Selected {{ tagData.length }} tags for {{ tagData.length }} Deal Memo{{
     data.length === 1 ? '' : 's' }}.
   </p>
 

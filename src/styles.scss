@@ -106,6 +106,10 @@ a {
   justify-content: space-between;
 }
 
+.flex-direction-column {
+  flex-direction: column;
+}
+
 .spinner-container {
   display: flex;
   justify-content: center;
@@ -119,4 +123,8 @@ a {
   border-radius: 6px;
   padding: 4px;
   border: 1px solid black;
+}
+
+ngx-extended-pdf-viewer .textLayer .highlight.selected {
+  opacity: 0.25;
 }

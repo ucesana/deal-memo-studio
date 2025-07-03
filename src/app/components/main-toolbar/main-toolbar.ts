@@ -6,7 +6,7 @@ import { map, shareReplay } from 'rxjs/operators';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatIconButton } from '@angular/material/button';
 import { MatSidenav } from '@angular/material/sidenav';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { GoogleAuthService } from '../../services/google-auth.service';
 import { MatIcon } from '@angular/material/icon';
@@ -33,6 +33,7 @@ export class MainToolbar {
   private readonly _googleAuthService = inject(GoogleAuthService);
   private readonly _overlayContainer = inject(OverlayContainer);
   private readonly _breakpointObserver = inject(BreakpointObserver);
+  private readonly _router = inject(Router);
 
   public isLoggedIn$: Observable<boolean> =
     this._googleAuthService.getIsLoggedIn();
