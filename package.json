@@ -40,6 +40,7 @@
     "@types/gapi.client.sheets-v4": "^0.0.4",
     "@types/google.accounts": "^0.0.16",
     "@types/jasmine": "~5.1.0",
+    "angular-cli-ghpages": "^2.0.3",
     "jasmine-core": "~5.7.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

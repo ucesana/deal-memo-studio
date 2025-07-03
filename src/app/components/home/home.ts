@@ -1,13 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { MainToolbar } from '../main-toolbar/main-toolbar';
-import { AsyncPipe } from '@angular/common';
 import { GoogleAuthService } from '../../services/google-auth.service';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, MainToolbar, AsyncPipe],
+  imports: [RouterLink, RouterOutlet, MainToolbar],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
