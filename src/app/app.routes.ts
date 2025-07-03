@@ -9,7 +9,12 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'home',
+    redirectTo: 'home/welcome',
+  },
+  {
+    path: 'home',
+    pathMatch: 'full',
+    redirectTo: 'home/welcome',
   },
   {
     path: 'home',
@@ -33,6 +38,14 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/terms/terms').then((c) => c.Terms),
         title: 'Terms of Service - Deal Memo Studio',
+      },
+
+      {
+        path: 'error404',
+        loadComponent: () =>
+          import('./components/error404/error404.component').then(
+            (c) => c.Error404Component,
+          ),
       },
     ],
   },
@@ -159,9 +172,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    loadComponent: () =>
-      import('./components/error404/error404.component').then(
-        (c) => c.Error404Component,
-      ),
+    redirectTo: 'home/error404',
   },
 ];

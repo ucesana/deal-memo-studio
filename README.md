@@ -54,6 +54,39 @@ ng e2e
 
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
+## To deploy to GitHub Pages
+
+First add angular-cli-ghpages to your project:
+
+```bash
+ng add angular-cli-ghpages
+```
+
+Copy index.html to 404.html:
+
+```bash
+cp dist/deal-memo-studio/browser/index.html dist/deal-memo-studio/browser/404.html`
+
+Then build your project for production:
+
+```bash
+ng deploy --base-href=/deal-memo 
+```
+
+Open your browser and navigate to `https://<your-github-username>.github.io/deal-memo/` to see your deployed application.
+
+## To undeploy from GitHub Pages
+
+To undeploy your application from GitHub Pages, delete the gh-pages branch from your local repository and the remote repository.:
+
+```bash
+# Delete the local gh-pages branch
+git branch -D gh-pages
+
+# Delete the remote gh-pages branch
+git push origin --delete gh-pages
+```
+
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
