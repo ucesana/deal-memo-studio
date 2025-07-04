@@ -38,18 +38,7 @@ export class DriveContextMenuService {
     }
   };
 
-  private validFile() {
-    return (node: FileNode) =>
-      [
-        'application/vnd.google-apps.folder',
-        'application/vnd.google-apps.document',
-        'application/vnd.google-apps.spreadsheet',
-        'application/vnd.oasis.opendocument.text',
-        'application/pdf',
-      ].includes(node.mimeType);
-  }
-
-  openInGoogleDrive(): ContextMenuItem {
+  public openInGoogleDrive(): ContextMenuItem {
     return {
       label: 'Open in Google Drive',
       condition: this.validFile(),
@@ -97,5 +86,39 @@ export class DriveContextMenuService {
           .subscribe((file: gapi.client.drive.File) => resultFn(file));
       },
     };
+  }
+
+  public openFolder(): ContextMenuItem {
+    return {
+      label: 'Open Folder',
+      condition: (node: FileNode) =>
+        node.mimeType === 'application/vnd.google-apps.folder',
+      action: (node: FileNode) =>
+        this._router.navigate(['/dashboard/drive', node.id]).then((_) => {}),
+    };
+  }
+
+  public openFolderInGoogleDrive(): ContextMenuItem {
+    return {
+      label: 'Open Folder in Google Drive',
+      condition: (node: FileNode) =>
+        node.mimeType === 'application/vnd.google-apps.folder',
+      action: (node: FileNode) =>
+        window.open(
+          `https://drive.google.com/drive/folders/${node.id}`,
+          '_blank',
+        ),
+    };
+  }
+
+  private validFile() {
+    return (node: FileNode) =>
+      [
+        'application/vnd.google-apps.folder',
+        'application/vnd.google-apps.document',
+        'application/vnd.google-apps.spreadsheet',
+        'application/vnd.oasis.opendocument.text',
+        'application/pdf',
+      ].includes(node.mimeType);
   }
 }

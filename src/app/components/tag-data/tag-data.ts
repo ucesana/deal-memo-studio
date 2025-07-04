@@ -1,4 +1,11 @@
-import { Component, Input, OnInit, viewChild } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  viewChild,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
@@ -29,17 +36,25 @@ import { TagValuePipe } from '../../pipes/tag-value-pipe';
   templateUrl: './tag-data.html',
   styleUrl: './tag-data.scss',
 })
-export class TagData implements OnInit {
+export class TagData implements OnInit, OnChanges {
   @Input() data!: DocumentTagData;
   accordion = viewChild.required(MatAccordion);
 
-  public tagData: TagDataType = [];
+  public totalDealMemos: number = 0;
+  public totalTags: number = 0;
 
   constructor() {
     if (this.data?.length) {
-      this.tagData = this.data[0] || [];
+      this.totalDealMemos = this.data?.length ?? 0;
+      this.totalTags = this.data?.[0]?.length ?? 0;
     }
   }
 
   ngOnInit(): void {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const data = changes['data']?.currentValue as DocumentTagData;
+    this.totalDealMemos = data?.length ?? 0;
+    this.totalTags = data?.[0]?.length ?? 0;
+  }
 }

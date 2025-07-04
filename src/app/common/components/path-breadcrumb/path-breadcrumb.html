@@ -8,7 +8,7 @@
     @for (part of pathParts; track part; let isLast = $last) {
     <span class="breadcrumb-part" [ngClass]="{'breadcrumb-last': isLast}">
       <a
-        routerLink="/drive/{{part.id}}"
+        routerLink="/dashboard/drive/{{part.id}}"
         (contextmenu)="openContextMenu(part.id, $event)"
         >{{ part.name }}</a
       >

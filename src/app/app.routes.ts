@@ -83,7 +83,7 @@ export const routes: Routes = [
         data: { reuseRoute: true },
       },
       {
-        path: 'drive',
+        path: 'drive/:id',
         canActivate: [AuthGuard],
         loadComponent: () =>
           import('./components/drive/drive.component').then(

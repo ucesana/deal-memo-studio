@@ -39,6 +39,7 @@
         <mat-icon aria-label="Close">close</mat-icon>
       </button>
     </div>
+    <p>Select rows to preview the deal memos you can generate.</p>
     @if (this.tagData$ | async; as tagData) {
       <app-tag-data [data]="tagData"></app-tag-data>
     }

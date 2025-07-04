@@ -23,8 +23,8 @@ export class PathBreadcrumb {
 
   constructor() {
     this.contextMenuItems = [
-      this._driveContextMenuService.openFile(),
-      this._driveContextMenuService.openInGoogleDrive(),
+      this._driveContextMenuService.openFolder(),
+      this._driveContextMenuService.openFolderInGoogleDrive(),
     ];
   }
 

@@ -108,8 +108,6 @@ export class DriveTreeComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.parentId = this.route.snapshot.paramMap.get('parentId') || 'root';
-
     this.isLoggedIn$
       .pipe(untilDestroyed(this))
       .subscribe((isLoggedIn: boolean) => {

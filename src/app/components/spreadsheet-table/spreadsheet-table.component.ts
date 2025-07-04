@@ -76,7 +76,7 @@ export class SpreadsheetTableComponent implements OnChanges {
       .pipe(untilDestroyed(this))
       .subscribe((sheetsSelection) => {
         this.tagData.emit(
-          this.generatePages(this.generateTagData(sheetsSelection)),
+          this.generateDocumentTagData(this.generateTagData(sheetsSelection)),
         );
       });
   }
@@ -106,26 +106,31 @@ export class SpreadsheetTableComponent implements OnChanges {
     });
   }
 
-  private generatePages(tagData: string[][][][]): DocumentTagData {
+  private generateDocumentTagData(tagData: string[][][][]): DocumentTagData {
     function cartesianProduct<T>(arrays: T[][]): T[][] {
-      return arrays.reduce<T[][]>(
+      const prod = arrays.reduce<T[][]>(
         (a, b) => a.flatMap((x) => b.map((y) => [...x, y])),
         [[]],
       );
+      return prod;
     }
 
     const filteredTagData = tagData.filter((sheet) => sheet.length > 0);
     const product = cartesianProduct(filteredTagData);
-    return product.map((combo) => {
-      return [
-        ...combo.flat().sort((a, b) =>
-          a[0].localeCompare(b[0], undefined, {
-            numeric: true,
-            sensitivity: 'base',
-          }),
-        ),
-      ];
-    });
+
+    const s = product
+      .map((combo) => {
+        return [
+          ...combo.flat().sort((a, b) =>
+            a[0].localeCompare(b[0], undefined, {
+              numeric: true,
+              sensitivity: 'base',
+            }),
+          ),
+        ];
+      })
+      .filter((tagData) => tagData.length > 0);
+    return s;
   }
 
   private generateTags(spreadsheet: any): string[] {

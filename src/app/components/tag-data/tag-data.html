@@ -1,11 +1,7 @@
 <div class="tag-data-container">
-  @if (tagData.length === 0) {
-  <p>Select rows to preview the deal memos you can generate.</p>
-  } @else {
-
   <p>
-    Selected {{ tagData.length }} tags for {{ tagData.length }} Deal Memo{{
-    data.length === 1 ? '' : 's' }}.
+    Selected {{ totalTags }} tags for {{ totalDealMemos }} Deal Memo{{
+    totalDealMemos === 1 ? '' : 's' }}.
   </p>
 
   <div class="tag-data-action-buttons">
@@ -16,14 +12,14 @@
       Collapse All
     </button>
   </div>
-  }
+
   <mat-accordion class="tag-data-headers-align" multi>
     @for (tagData of data; track tagData; let i = $index) { @if (tagData.length
     > 0) {
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title
-          >{{ tagData | tagValue: 'Artist Name': `Deal Memo #${i}`
+          >{{ tagData | tagValue: 'Artist Name': `Deal Memo #${i + 1}`
           }}</mat-panel-title
         >
       </mat-expansion-panel-header>

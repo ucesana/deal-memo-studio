@@ -3,7 +3,7 @@ import {
   DriveTreeComponent,
   FlatTreeNode,
 } from '../drive-tree/drive-tree.component';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SnackService } from '../../common/services/snack.service';
 import {
   DriveSearchQuery,
@@ -22,11 +22,12 @@ export class DriveComponent {
   @ViewChild('driveTree') driveTree!: DriveTreeComponent;
 
   private readonly _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
   private readonly _snackService = inject(SnackService);
   private readonly _googleDriveService = inject(GoogleDriveService);
   private readonly _driveContextMenuService = inject(DriveContextMenuService);
 
-  public readonly parentId: string = 'root';
+  public parentId: string | null = null;
 
   public contextMenuItems: ContextMenuItem[] = [];
   public searchQuery: DriveSearchQuery = {
@@ -41,6 +42,12 @@ export class DriveComponent {
   };
 
   constructor() {
+    const id = this._route.snapshot.params['id'];
+    if (id?.length > 0) {
+      this.parentId = id;
+    } else {
+      this.parentId = 'root';
+    }
     this.contextMenuItems = [
       this._driveContextMenuService.openInGoogleDrive(),
       this._driveContextMenuService.saveAsGoogleDoc((file) =>

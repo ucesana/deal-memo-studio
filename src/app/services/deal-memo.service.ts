@@ -86,7 +86,6 @@ export class DealMemoService {
   }
 
   private createAppFileStructure(): void {
-    console.log('Creating app file structure');
     let fileStructure: Partial<AppFileStructure> = {};
 
     this.appLoadProgressStepper.pending();
