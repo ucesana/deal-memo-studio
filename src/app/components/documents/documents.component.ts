@@ -65,7 +65,6 @@ import { blobToBase64 } from '../../common/functions/base64';
   styleUrl: './documents.component.scss',
 })
 export class DocumentsComponent implements OnInit, AfterViewInit {
-  @Input() id: string = '';
   @Input() height: string = '100vh';
   @Input() width: string = '812px';
 
@@ -76,8 +75,9 @@ export class DocumentsComponent implements OnInit, AfterViewInit {
   private readonly _googleAuthService = inject(GoogleAuthService);
   private readonly _googleDriveService = inject(GoogleDriveService);
   private readonly _googleDocsService = inject(GoogleDocsService);
-  private readonly _lastVisited = inject(AppSettingsService);
+  private readonly _appSettingsService = inject(AppSettingsService);
   private readonly _cdr = inject(ChangeDetectorRef);
+
   private readonly _docSubject = new BehaviorSubject<any>(null);
   private readonly _docLoadStateSubject: Subject<
     'loading' | 'error' | 'loaded'
@@ -88,6 +88,7 @@ export class DocumentsComponent implements OnInit, AfterViewInit {
   public readonly docLoadState$: Observable<'loading' | 'error' | 'loaded'> =
     this._docLoadStateSubject.asObservable();
 
+  public id: string = '';
   public isPanelOpen = false;
   public tags: string[] = [];
   public tagErrors: string[] = [];
@@ -97,9 +98,12 @@ export class DocumentsComponent implements OnInit, AfterViewInit {
   }
 
   public ngOnInit(): void {
-    const id = this._route.snapshot.paramMap.get('id');
-    if (id) {
-      this._lastVisited.setLastEditorId(id);
+    this.id =
+      this._route.snapshot.paramMap.get('id') ??
+      this._appSettingsService.getLastEditorId() ??
+      '';
+    if (this.id) {
+      this._appSettingsService.setLastEditorId(this.id);
     }
   }
 

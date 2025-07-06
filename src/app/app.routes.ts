@@ -1,9 +1,5 @@
 import { Routes } from '@angular/router';
-import { EditorRedirectGuard } from './guards/documents-redirect.guard';
-import { BlankComponent } from './common/components/blank/blank-component';
-import { SpreadsheetRedirectGuard } from './guards/spreadsheet-redirect.guard';
 import { AuthGuard } from './guards/auth.guard';
-import { PdfRedirectGuard } from './guards/pdf-redirect.guard';
 
 export const routes: Routes = [
   {
@@ -102,81 +98,78 @@ export const routes: Routes = [
         title: 'My Drive',
         data: { menu: false },
       },
+
       {
         path: 'docs',
         canActivate: [AuthGuard],
-        children: [
-          {
-            path: '',
-            canActivate: [EditorRedirectGuard],
-            component: BlankComponent,
-          },
-          {
-            path: ':id',
-            loadComponent: () =>
-              import('./components/documents/documents.component').then(
-                (c) => c.DocumentsComponent,
-              ),
-            data: {
-              height: 'calc(100vh - 128px - 16px)',
-              width: '812px',
-            },
-          },
-        ],
+        loadComponent: () =>
+          import('./components/documents/documents.component').then(
+            (c) => c.DocumentsComponent,
+          ),
+        data: {
+          height: 'calc(100vh - 128px - 16px)',
+          width: '812px',
+          menu: true,
+        },
         title: 'Documents',
-        data: { menu: true },
+      },
+      {
+        path: 'docs/:id',
+        canActivate: [AuthGuard],
+        loadComponent: () =>
+          import('./components/documents/documents.component').then(
+            (c) => c.DocumentsComponent,
+          ),
+        data: {
+          height: 'calc(100vh - 128px - 16px)',
+          width: '812px',
+          menu: false,
+        },
+        title: 'Documents',
       },
       {
         path: 'spreadsheets',
         canActivate: [AuthGuard],
-        children: [
-          {
-            path: '',
-            canActivate: [SpreadsheetRedirectGuard],
-            component: BlankComponent,
-          },
-          {
-            path: ':id',
-            loadComponent: () =>
-              import('./components/spreadsheets/spreadsheets.component').then(
-                (c) => c.SpreadsheetsComponent,
-              ),
-          },
-        ],
+        loadComponent: () =>
+          import('./components/spreadsheets/spreadsheets.component').then(
+            (c) => c.SpreadsheetsComponent,
+          ),
         title: 'Sheets',
         data: { menu: true },
       },
       {
+        path: 'spreadsheets/:id',
+        canActivate: [AuthGuard],
+        loadComponent: () =>
+          import('./components/spreadsheets/spreadsheets.component').then(
+            (c) => c.SpreadsheetsComponent,
+          ),
+        title: 'Sheets',
+        data: { menu: false },
+      },
+      {
         path: 'pdf',
         canActivate: [AuthGuard],
-        children: [
-          {
-            path: '',
-            canActivate: [PdfRedirectGuard],
-            component: BlankComponent,
-          },
-          {
-            path: ':id',
-            loadComponent: () =>
-              import('./components/pdf/pdf.component').then(
-                (c) => c.PdfComponent,
-              ),
-            data: {
-              height: 'calc(100vh - 128px - 16px)',
-              width: '812px',
-            },
-          },
-        ],
-        title: 'Pdf',
-        data: { menu: true },
-      },
-
-      {
-        path: 'missing-document',
         loadComponent: () =>
-          import(
-            './components/missing-document/missing-document.component'
-          ).then((c) => c.MissingDocumentComponent),
+          import('./components/pdf/pdf.component').then((c) => c.PdfComponent),
+        data: {
+          height: 'calc(100vh - 128px - 16px)',
+          width: '812px',
+          menu: true,
+        },
+        title: 'Pdf',
+      },
+      {
+        path: 'pdf/:id',
+        canActivate: [AuthGuard],
+        loadComponent: () =>
+          import('./components/pdf/pdf.component').then((c) => c.PdfComponent),
+        data: {
+          height: 'calc(100vh - 128px - 16px)',
+          width: '812px',
+          menu: false,
+        },
+        title: 'Pdf',
       },
     ],
   },

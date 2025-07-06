@@ -21,29 +21,32 @@ import { map, take } from 'rxjs/operators';
   styleUrl: './spreadsheets.component.scss',
 })
 export class SpreadsheetsComponent implements OnInit, AfterViewInit {
-  private readonly googleAuthService = inject(GoogleAuthService);
-  private readonly googleSheetsService = inject(GoogleSheetsService);
-  private readonly lastVisited = inject(AppSettingsService);
-  private readonly route = inject(ActivatedRoute);
-
-  @Input() id: string = '';
+  private readonly _googleAuthService = inject(GoogleAuthService);
+  private readonly _googleSheetsService = inject(GoogleSheetsService);
+  private readonly _appSettingsService = inject(AppSettingsService);
+  private readonly _route = inject(ActivatedRoute);
 
   private _spreadsheetSubject: Subject<any> = new BehaviorSubject(null);
+
+  public id: string = '';
 
   public isLoggedIn$: Observable<boolean>;
   public spreadsheet$: Observable<gapi.client.sheets.Spreadsheet>;
 
   constructor() {
-    this.isLoggedIn$ = this.googleAuthService.getIsLoggedIn();
+    this.isLoggedIn$ = this._googleAuthService.getIsLoggedIn();
     this.spreadsheet$ = this._spreadsheetSubject
       .asObservable()
       .pipe(filter((o) => !!o));
   }
 
   public ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.lastVisited.setLastSpreadsheetId(id);
+    this.id =
+      this._route.snapshot.paramMap.get('id') ??
+      this._appSettingsService.getLastSpreadsheetId() ??
+      '';
+    if (this.id) {
+      this._appSettingsService.setLastSpreadsheetId(this.id);
     }
   }
 
@@ -64,7 +67,7 @@ export class SpreadsheetsComponent implements OnInit, AfterViewInit {
   public selectTagData(tagData: DocumentTagData): void {}
 
   public loadSpreadsheet(id: string): void {
-    this.googleSheetsService
+    this._googleSheetsService
       .getSpreadsheet(id)
       .pipe(
         take(1),
