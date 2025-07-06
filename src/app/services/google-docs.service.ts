@@ -52,16 +52,17 @@ export class GoogleDocsService {
     );
   }
 
-  async uploadAndConvertDocxToGoogleDoc(
-    file: Blob,
+  async uploadBlobAs(
+    blob: Blob,
     fileName: string,
     parentIds: string[] = [],
+    targetMimeType: string = 'application/vnd.google-apps.document',
   ): Promise<gapi.client.drive.File> {
     const accessToken = gapi.auth.getToken().access_token;
 
     const metadata = {
-      name: fileName.replace(/\.docx$/, ''), // Remove .docx for Google Doc
-      mimeType: 'application/vnd.google-apps.document', // Target Google Docs
+      name: fileName.replace(/\.docx$/, ''),
+      mimeType: targetMimeType,
     };
 
     if (parentIds.length) {
@@ -75,7 +76,7 @@ export class GoogleDocsService {
       'metadata',
       new Blob([JSON.stringify(metadata)], { type: 'application/json' }),
     );
-    form.append('file', file, metadata.name);
+    form.append('file', blob, metadata.name);
 
     const response = await fetch(
       'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',

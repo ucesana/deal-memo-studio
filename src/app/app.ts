@@ -2,6 +2,7 @@ import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { GoogleAuthService } from './services/google-auth.service';
 import { MatSidenavContainer } from '@angular/material/sidenav';
+import { AppSettingsService } from './services/app-settings.service';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ import { MatSidenavContainer } from '@angular/material/sidenav';
 })
 export class App implements OnInit {
   private readonly _googleAuthService = inject(GoogleAuthService);
+  private readonly _appSettingsService = inject(AppSettingsService);
 
   @HostListener('document:contextmenu', ['$event'])
   public onGlobalRightClick(event: MouseEvent) {
@@ -23,5 +25,7 @@ export class App implements OnInit {
         this._googleAuthService.initAccessToken();
       });
     }
+
+    this._appSettingsService.initTheme();
   }
 }

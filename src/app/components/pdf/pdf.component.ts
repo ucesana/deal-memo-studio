@@ -22,7 +22,7 @@ import {
 import { GoogleAuthService } from '../../services/google-auth.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ActivatedRoute } from '@angular/router';
-import { LastVisitedService } from '../../services/last-visited-service';
+import { AppSettingsService } from '../../services/app-settings.service';
 import { map } from 'rxjs/operators';
 import { GoogleDriveService } from '../../services/google-drive.service';
 import { blobToBase64 } from '../../common/functions/base64';
@@ -52,7 +52,7 @@ export class PdfComponent implements OnInit, AfterViewInit {
   private readonly _googleAuthService = inject(GoogleAuthService);
   private readonly _googleDriveService = inject(GoogleDriveService);
   private readonly _route = inject(ActivatedRoute);
-  private readonly _lastVisited = inject(LastVisitedService);
+  private readonly _lastVisited = inject(AppSettingsService);
   private readonly _cdr = inject(ChangeDetectorRef);
 
   private readonly _docSubject = new BehaviorSubject<{

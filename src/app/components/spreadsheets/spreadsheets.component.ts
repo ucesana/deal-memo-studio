@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, inject, Input, OnInit } from '@angular/core';
 import { GoogleAuthService } from '../../services/google-auth.service';
 import { GoogleSheetsService } from '../../services/google-sheets.service';
-import { LastVisitedService } from '../../services/last-visited-service';
+import { AppSettingsService } from '../../services/app-settings.service';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, filter, Observable, Subject } from 'rxjs';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -23,7 +23,7 @@ import { map, take } from 'rxjs/operators';
 export class SpreadsheetsComponent implements OnInit, AfterViewInit {
   private readonly googleAuthService = inject(GoogleAuthService);
   private readonly googleSheetsService = inject(GoogleSheetsService);
-  private readonly lastVisited = inject(LastVisitedService);
+  private readonly lastVisited = inject(AppSettingsService);
   private readonly route = inject(ActivatedRoute);
 
   @Input() id: string = '';

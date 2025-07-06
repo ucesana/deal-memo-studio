@@ -88,6 +88,21 @@ export class DriveContextMenuService {
     };
   }
 
+  saveAsDocx(
+    resultFn: (result: gapi.client.drive.File) => void = (_) => {},
+  ): ContextMenuItem {
+    return {
+      label: 'Save as Open Office Document',
+      condition: (node: FileNode) =>
+        node.mimeType === 'application/vnd.google-apps.document',
+      action: (node: FileNode) => {
+        this._googleDriveService
+          .saveAsDocxAndOpenSpinnerDialog(node.id)
+          .subscribe((file: gapi.client.drive.File) => resultFn(file));
+      },
+    };
+  }
+
   public openFolder(): ContextMenuItem {
     return {
       label: 'Open Folder',

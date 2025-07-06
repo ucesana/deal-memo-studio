@@ -161,7 +161,7 @@ export class GoogleAuthService {
     if (response.status === 401) {
       this.logout();
     }
-    console.error('Error accessing Google API:', response.result.error);
+    console.error('Error accessing Google API:', response.result?.error);
     return throwError(() => response);
   }
 

@@ -50,6 +50,7 @@ export class DriveSelectorComponent {
       this._driveContextMenuService.saveAsGoogleDoc((_) =>
         this.driveTree.refresh(),
       ),
+      this._driveContextMenuService.saveAsDocx((_) => this.driveTree.refresh()),
     ];
   }
 

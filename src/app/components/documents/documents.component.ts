@@ -16,10 +16,11 @@ import {
   of,
   Subject,
   switchMap,
+  take,
 } from 'rxjs';
 import { GoogleDriveService } from '../../services/google-drive.service';
 
-import { LastVisitedService } from '../../services/last-visited-service';
+import { AppSettingsService } from '../../services/app-settings.service';
 import { AsyncPipe } from '@angular/common';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { GoogleAuthService } from '../../services/google-auth.service';
@@ -75,7 +76,7 @@ export class DocumentsComponent implements OnInit, AfterViewInit {
   private readonly _googleAuthService = inject(GoogleAuthService);
   private readonly _googleDriveService = inject(GoogleDriveService);
   private readonly _googleDocsService = inject(GoogleDocsService);
-  private readonly _lastVisited = inject(LastVisitedService);
+  private readonly _lastVisited = inject(AppSettingsService);
   private readonly _cdr = inject(ChangeDetectorRef);
   private readonly _docSubject = new BehaviorSubject<any>(null);
   private readonly _docLoadStateSubject: Subject<
@@ -99,19 +100,21 @@ export class DocumentsComponent implements OnInit, AfterViewInit {
     const id = this._route.snapshot.paramMap.get('id');
     if (id) {
       this._lastVisited.setLastEditorId(id);
+
+      this.loadResource(this.id);
     }
   }
 
   public ngAfterViewInit(): void {
-    this.isLoggedIn$
-      .pipe(untilDestroyed(this))
-      .subscribe((isLoggedIn: boolean) => {
-        if (isLoggedIn) {
-          if (this.id?.length) {
-            this.loadResource(this.id);
-          }
-        }
-      });
+    // this.isLoggedIn$
+    //   .pipe(untilDestroyed(this))
+    //   .subscribe((isLoggedIn: boolean) => {
+    //     if (isLoggedIn) {
+    //       if (this.id?.length) {
+    //         this.loadResource(this.id);
+    //       }
+    //     }
+    //   });
   }
 
   private loadResource(id: string) {
@@ -134,6 +137,7 @@ export class DocumentsComponent implements OnInit, AfterViewInit {
           text,
           content,
         })),
+        take(1),
         catchError((err) => {
           console.error('Failed to get document', err);
           this.tagErrors = [];

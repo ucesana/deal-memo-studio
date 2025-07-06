@@ -83,7 +83,7 @@ export const routes: Routes = [
         data: { reuseRoute: true },
       },
       {
-        path: 'drive/:id',
+        path: 'drive',
         canActivate: [AuthGuard],
         loadComponent: () =>
           import('./components/drive/drive.component').then(
@@ -91,6 +91,16 @@ export const routes: Routes = [
           ),
         title: 'My Drive',
         data: { menu: true },
+      },
+      {
+        path: 'drive/:id',
+        canActivate: [AuthGuard],
+        loadComponent: () =>
+          import('./components/drive/drive.component').then(
+            (c) => c.DriveComponent,
+          ),
+        title: 'My Drive',
+        data: { menu: false },
       },
       {
         path: 'docs',

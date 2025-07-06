@@ -20,10 +20,12 @@
     class="theme-toggle-btn"
     (click)="toggleTheme()"
     [attr.aria-label]="
-      isLightTheme ? 'Switch to dark mode' : 'Switch to light mode'
+      theme === 'light-theme' ? 'Switch to dark mode' : 'Switch to light mode'
     "
   >
-    <mat-icon>{{ isLightTheme ? "dark_mode" : "light_mode" }}</mat-icon>
+    <mat-icon
+      >{{ theme === 'light-theme' ? "dark_mode" : "light_mode" }}</mat-icon
+    >
   </button>
   <button matIconButton [matMenuTriggerFor]="accountMenu" aria-label="Account">
     @if (this.isLoggedIn$ | async) {

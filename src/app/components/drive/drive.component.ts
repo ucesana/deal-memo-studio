@@ -53,6 +53,9 @@ export class DriveComponent {
       this._driveContextMenuService.saveAsGoogleDoc((file) =>
         this._router.navigate(['/dashboard/docs', file.id]),
       ),
+      this._driveContextMenuService.saveAsDocx((file) =>
+        this._router.navigate(['/dashboard/docs', file.id]),
+      ),
     ];
   }
 

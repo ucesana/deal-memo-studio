@@ -11,6 +11,7 @@ import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { GoogleAuthService } from '../../services/google-auth.service';
 import { MatIcon } from '@angular/material/icon';
 import { OverlayContainer } from '@angular/cdk/overlay';
+import { AppSettingsService } from '../../services/app-settings.service';
 
 @Component({
   selector: 'app-main-toolbar',
@@ -30,15 +31,14 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 export class MainToolbar {
   @Input() drawer!: MatSidenav;
 
+  public theme: 'light-theme' | 'dark-theme' = 'light-theme';
+
   private readonly _googleAuthService = inject(GoogleAuthService);
-  private readonly _overlayContainer = inject(OverlayContainer);
   private readonly _breakpointObserver = inject(BreakpointObserver);
-  private readonly _router = inject(Router);
+  private readonly _appSettingsService = inject(AppSettingsService);
 
   public isLoggedIn$: Observable<boolean> =
     this._googleAuthService.getIsLoggedIn();
-
-  public isLightTheme = true;
 
   public isHandset$: Observable<boolean> = this._breakpointObserver
     .observe(Breakpoints.Handset)
@@ -47,15 +47,12 @@ export class MainToolbar {
       shareReplay(),
     );
 
+  constructor() {
+    this.theme = this._appSettingsService.getTheme();
+  }
+
   public toggleTheme() {
-    this.isLightTheme = !this.isLightTheme;
-    document.body.classList.remove('light-theme', 'dark-theme');
-    this._overlayContainer
-      .getContainerElement()
-      .classList.remove('light-theme', 'dark-theme');
-    const theme = this.isLightTheme ? 'light-theme' : 'dark-theme';
-    document.body.classList.add(theme);
-    this._overlayContainer.getContainerElement().classList.add(theme);
+    this._appSettingsService.toggleTheme();
   }
 
   public loginGoogle() {

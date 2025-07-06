@@ -137,7 +137,7 @@ export class GoogleDriveService {
     return parts.join(' and ');
   }
 
-  exportFileAsBinary(fileId: string) {
+  exportPdfAsBinary(fileId: string): Observable<Blob> {
     const accessToken = gapi.auth.getToken().access_token;
     const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
     const headers = new HttpHeaders({
@@ -352,20 +352,59 @@ export class GoogleDriveService {
 
   saveAsGoogleDoc(id: string): Observable<gapi.client.drive.File> {
     return forkJoin([
-      this.exportFileAsBinary(id),
+      this.exportPdfAsBinary(id),
       this.getFile(id, {
         fields: 'id, name, mimeType, parents',
       }).pipe(filter((o) => !!o)),
     ]).pipe(
       switchMap(([file, fileMetadata]: [Blob, gapi.client.drive.File]) =>
         from(
-          this.googleDocsService.uploadAndConvertDocxToGoogleDoc(
+          this.googleDocsService.uploadBlobAs(
             file,
             fileMetadata.name || 'Untitled',
             fileMetadata.parents,
           ),
         ),
       ),
+      catchError((response) => {
+        return this.googleAuthService.handleError(response);
+      }),
+    );
+  }
+
+  saveAsDocx(fileId: string): Observable<gapi.client.drive.File> {
+    let originalFile: gapi.client.drive.File = {};
+
+    return forkJoin([
+      from(
+        gapi.client.drive.files.export({
+          fileId,
+          mimeType:
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        }),
+      ) as Observable<gapi.client.Response<Blob>>,
+      this.getFile(fileId, {
+        fields: 'id, name, mimeType, parents',
+      }).pipe(filter((o) => !!o)),
+    ]).pipe(
+      switchMap(
+        ([exportResponse, fileMetadata]: [
+          gapi.client.Response<Blob>,
+          gapi.client.drive.File,
+        ]) => {
+          originalFile = fileMetadata;
+          return from(
+            this.googleDocsService.uploadBlobAs(
+              this.binaryStringToBlob(exportResponse.body),
+              fileMetadata.name || 'Untitled',
+              fileMetadata.parents,
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ),
+          );
+        },
+      ),
+      map((createResponse) => originalFile),
+      take(1),
       catchError((response) => {
         return this.googleAuthService.handleError(response);
       }),
@@ -432,6 +471,22 @@ export class GoogleDriveService {
       tap((file: gapi.client.drive.File) =>
         this.snackService.openSnackBar(
           `${file.name} has been saved as a Google Doc.`,
+        ),
+      ),
+      finalize(() => {
+        this.dialog.closeAll();
+      }),
+    );
+  }
+
+  public saveAsDocxAndOpenSpinnerDialog(
+    fileId: string,
+  ): Observable<gapi.client.drive.File> {
+    this.openDialog('500ms', '250ms');
+    return this.saveAsDocx(fileId).pipe(
+      tap((file: gapi.client.drive.File) =>
+        this.snackService.openSnackBar(
+          `${file.name} has been saved as a Open Office document.`,
         ),
       ),
       finalize(() => {
