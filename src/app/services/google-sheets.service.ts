@@ -28,7 +28,7 @@ export class GoogleSheetsService {
 
   constructor() {}
 
-  loadSheetsApi(): Observable<any> {
+  loadSheetsApi(): Observable<gapi.client.Response<any>> {
     if (!this.googleAuthService.isAuthenticated()) {
       console.warn('Token not found');
       return throwError(() => new Error('Not signed in to Google API client.'));

@@ -23,29 +23,25 @@ export class GoogleDocsService {
   private isDocsApiLoaded = false;
   private docsApiLoadedPromise: Promise<any> = new Promise((resolve) => {});
 
-  public getDocument(documentId: string): Observable<// @ts-ignore
-  gapi.client.docs.Document> {
+  public getDocument(
+    documentId: string,
+  ): Observable<gapi.client.docs.Document> {
     return this.loadDocsApi().pipe(
       switchMap(
         () =>
-          from(
-            // @ts-ignore
-            gapi.client.docs.documents.get({ documentId }),
-            // @ts-ignore
-          ) as Observable<gapi.client.Response<gapi.client.docs.Document>>,
+          from(gapi.client.docs.documents.get({ documentId })) as Observable<
+            gapi.client.Response<gapi.client.docs.Document>
+          >,
       ),
       take(1),
-      map(
-        // @ts-ignore
-        (response: gapi.client.Response<gapi.client.docs.Document>) => {
-          try {
-            return JSON.parse(response.body);
-          } catch (error) {
-            console.error('Error parsing Google Doc JSON:', error);
-            throw error;
-          }
-        },
-      ),
+      map((response: gapi.client.Response<gapi.client.docs.Document>) => {
+        try {
+          return JSON.parse(response.body);
+        } catch (error) {
+          console.error('Error parsing Google Doc JSON:', error);
+          throw error;
+        }
+      }),
       catchError((response) => {
         return this.googleAuthService.handleError(response);
       }),
@@ -131,7 +127,7 @@ export class GoogleDocsService {
       }),
     ).pipe(
       switchMap((copyRes: gapi.client.Response<gapi.client.drive.File>) => {
-        const id = copyRes.result.id;
+        const id = copyRes.result.id ?? '';
         const requests = tagData.map(([tagName, tagValue]) => ({
           replaceAllText: {
             containsText: {
@@ -143,10 +139,9 @@ export class GoogleDocsService {
         }));
 
         return from(
-          // @ts-ignore
           gapi.client.docs.documents.batchUpdate({
             documentId: id,
-            requests,
+            resource: { requests },
           }),
         ).pipe(
           map(
@@ -160,19 +155,5 @@ export class GoogleDocsService {
         );
       }),
     );
-  }
-
-  batchReplaceTagsAndCreateDocs(
-    documentId: string,
-    parentId: string,
-    documentTagData: DocumentTagData,
-    titleFn: (tagData: TagData, idx: number) => string,
-  ): Observable<(SimpleGoogleFile | undefined)[]> {
-    const allPromises = documentTagData.map((tagData, idx) => {
-      const title = titleFn ? titleFn(tagData, idx) : `Document ${idx + 1}`;
-      return this.applyTags(documentId, parentId, tagData, title).toPromise();
-    });
-
-    return from(Promise.all(allPromises));
   }
 }

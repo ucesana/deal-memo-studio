@@ -100,21 +100,13 @@ export class DocumentsComponent implements OnInit, AfterViewInit {
     const id = this._route.snapshot.paramMap.get('id');
     if (id) {
       this._lastVisited.setLastEditorId(id);
-
-      this.loadResource(this.id);
     }
   }
 
   public ngAfterViewInit(): void {
-    // this.isLoggedIn$
-    //   .pipe(untilDestroyed(this))
-    //   .subscribe((isLoggedIn: boolean) => {
-    //     if (isLoggedIn) {
-    //       if (this.id?.length) {
-    //         this.loadResource(this.id);
-    //       }
-    //     }
-    //   });
+    if (this.id?.length) {
+      this.loadResource(this.id);
+    }
   }
 
   private loadResource(id: string) {
