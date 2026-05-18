@@ -170,6 +170,7 @@ export class DriveTreeComponent implements OnInit {
   }
 
   public selectFile(flatTreeNode: FlatTreeNode): void {
+    console.log('Selected node:', flatTreeNode);
     if (flatTreeNode.type === 'folder') {
       this.toggleFolderNode(flatTreeNode);
     }

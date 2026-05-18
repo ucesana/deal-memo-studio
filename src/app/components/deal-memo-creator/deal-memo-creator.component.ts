@@ -247,7 +247,8 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
     this.stepper.selectedIndex = state.selectedIndex;
   }
 
-  public selectTemplate(file: gapi.client.drive.File): void {
+public selectTemplate(file: gapi.client.drive.File): void {
+  console.log('Selected template:', file);
     this.selectedTemplate = file;
     this.selectedTagData = null;
   }
