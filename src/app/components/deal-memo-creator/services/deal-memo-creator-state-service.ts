@@ -5,17 +5,30 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class DealMemoCreatorStateService {
-  private state = new BehaviorSubject<any>(null);
+  private readonly state = new BehaviorSubject<unknown>(null);
+  private readonly isCreatingSubject = new BehaviorSubject<boolean>(false);
 
-  setState(state: any): void {
+  readonly isCreating$: Observable<boolean> =
+    this.isCreatingSubject.asObservable();
+
+  setCreating(isCreating: boolean): void {
+    this.isCreatingSubject.next(isCreating);
+  }
+
+  getIsCreating(): boolean {
+    return this.isCreatingSubject.getValue();
+  }
+
+  setState(state: unknown): void {
     this.state.next(state);
   }
 
-  getState(): Observable<any> {
+  getState(): Observable<unknown> {
     return this.state.asObservable();
   }
 
   clearState(): void {
     this.state.next(null);
+    this.setCreating(false);
   }
 }

@@ -19,6 +19,7 @@ import { GoogleAuthService } from '../../services/google-auth.service';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ProgressBar } from '../../common/components/progress-bar/progress-bar';
 import { DealMemoService } from '../../services/deal-memo.service';
+import { DealMemoCreatorStateService } from '../deal-memo-creator/services/deal-memo-creator-state-service';
 import { MainToolbar } from '../main-toolbar/main-toolbar';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
@@ -46,9 +47,13 @@ export class DashboardComponent implements OnInit {
   private readonly _googleAuthService = inject(GoogleAuthService);
   private readonly _router = inject(Router);
   private readonly _dealMemoService = inject(DealMemoService);
+  private readonly _dealMemoCreatorStateService = inject(
+    DealMemoCreatorStateService,
+  );
   private readonly _breakpointObserver = inject(BreakpointObserver);
 
   public appLoadProgress$: Observable<number>;
+  public isCreatingDealMemos$ = this._dealMemoCreatorStateService.isCreating$;
 
   public menuRoutes: any[] =
     routes

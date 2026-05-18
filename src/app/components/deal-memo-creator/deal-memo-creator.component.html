@@ -99,10 +99,10 @@
             matButton="elevated"
             color="primary"
             (click)="create()"
-            [disabled]="isCreating"
+            [disabled]="isCreating$ | async"
             class="progress-container-create"
           >
-            @if (isCreating) {
+            @if (isCreating$ | async) {
               <mat-spinner diameter="20"></mat-spinner>
             } @else {
               Create

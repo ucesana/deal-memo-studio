@@ -36,6 +36,7 @@
   color="primary"
   class="fab-create"
   aria-label="Start creating deal memos"
+  [disabled]="isCreatingDealMemos$ | async"
   (click)="createNewDealMemos()"
   matTooltip="Start creating deal memos"
   matTooltipPosition="left"

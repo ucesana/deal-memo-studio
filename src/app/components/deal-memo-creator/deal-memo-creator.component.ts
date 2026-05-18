@@ -137,7 +137,7 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
   public dealMemosTotal: number = 0;
   public dealMemos: SimpleGoogleFile[] = [];
   public dealMemoPdfs: SimpleGoogleFile[] = [];
-  public isCreating: boolean = false;
+  public isCreating$ = this._stateService.isCreating$;
   public driveListContextMenuItems: ContextMenuItem[] = [];
   public selectedSpreadsheetId: string | null = null;
 
@@ -206,7 +206,7 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
     this.selectedTagData = null;
     this.selectedSpreadsheetId = null;
     this.reviewFormGroup.reset();
-    this.isCreating = false;
+    this._stateService.setCreating(false);
     this.destinationFolder = [];
     this.dealMemosTotal = 0;
     this.dealMemos = [];
@@ -223,7 +223,7 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
       selectedTagData: this.selectedTagData,
       selectedSpreadsheetId: this.selectedSpreadsheetId,
       reviewFormGroup: this.reviewFormGroup.value,
-      isCreating: this.isCreating,
+      isCreating: this._stateService.getIsCreating(),
       destinationFolder: this.destinationFolder,
       dealMemosTotal: this.dealMemosTotal,
       dealMemos: this.dealMemos,
@@ -239,7 +239,7 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
     this.selectedTagData = state.selectedTagData;
     this.selectedSpreadsheetId = state.selectedSpreadsheetId;
     this.reviewFormGroup.patchValue(state.reviewFormGroup);
-    this.isCreating = state.isCreating;
+    this._stateService.setCreating(state.isCreating);
     this.destinationFolder = state.destinationFolder;
     this.dealMemosTotal = state.dealMemosTotal;
     this.dealMemoPdfs = state.dealMemoPdfs;
@@ -266,7 +266,7 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
       const includePdf = this.reviewFormGroup.get('pdf')?.value;
 
       this.dealMemos = [];
-      this.isCreating = true;
+      this._stateService.setCreating(true);
 
       let app: AppFileStructure;
       let destinationFolder: { name: string; id: string }[] = [];
@@ -361,16 +361,18 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
                         .map((d) => d.result)
                         .filter((d) => !!d);
                       this._dealMemosProgressWatcher.done();
-                      this.isCreating = false;
+                      this._stateService.setCreating(false);
                       this.destinationFolder = destinationFolder;
                     },
                   );
                 } else {
                   this._dealMemosProgressWatcher.done();
-                  this.isCreating = false;
+                  this._stateService.setCreating(false);
                   this.destinationFolder = destinationFolder;
                 }
               });
+          } else {
+            this._stateService.setCreating(false);
           }
         });
     }
