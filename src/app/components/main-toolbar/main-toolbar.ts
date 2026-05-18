@@ -53,6 +53,7 @@ export class MainToolbar {
 
   public toggleTheme() {
     this._appSettingsService.toggleTheme();
+    this.theme = this._appSettingsService.getTheme();
   }
 
   public loginGoogle() {

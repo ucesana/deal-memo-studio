@@ -75,22 +75,42 @@ export class AppSettingsService {
   }
 
   public toggleTheme() {
-    document.body.classList.remove('light-theme', 'dark-theme');
-    this._overlayContainer
-      .getContainerElement()
-      .classList.remove('light-theme', 'dark-theme');
-    const theme = this.getTheme();
-    const newTheme = theme === 'dark-theme' ? 'light-theme' : 'dark-theme';
-    this.applyTheme(newTheme);
+    const newTheme =
+      this.getTheme() === 'dark-theme' ? 'light-theme' : 'dark-theme';
+    this.applyTheme(newTheme, true);
   }
 
   public initTheme() {
-    this.applyTheme(this.getTheme());
+    this.applyTheme(this.getTheme(), false);
   }
 
-  private applyTheme(newTheme: 'light-theme' | 'dark-theme') {
-    document.body.classList.add(newTheme);
-    this._overlayContainer.getContainerElement().classList.add(newTheme);
-    this.setTheme(newTheme);
+  private applyTheme(
+    newTheme: 'light-theme' | 'dark-theme',
+    animate = false,
+  ): void {
+    const updateDom = () => {
+      document.body.classList.remove('light-theme', 'dark-theme');
+      document.body.classList.add(newTheme);
+
+      const overlayElement = this._overlayContainer.getContainerElement();
+      overlayElement.classList.remove('light-theme', 'dark-theme');
+      overlayElement.classList.add(newTheme);
+
+      this.setTheme(newTheme);
+    };
+
+    if (this.shouldAnimateThemeChange(animate)) {
+      document.startViewTransition(() => updateDom());
+    } else {
+      updateDom();
+    }
+  }
+
+  private shouldAnimateThemeChange(animate: boolean): boolean {
+    return (
+      animate &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+      typeof document.startViewTransition === 'function'
+    );
   }
 }

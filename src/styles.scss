@@ -4,6 +4,11 @@
 
 @include mat.core();
 
+$app-typography: (
+  plain-family: Roboto,
+  brand-family: Roboto,
+);
+
 $light-theme: mat.define-theme(
   (
     color: (
@@ -11,6 +16,7 @@ $light-theme: mat.define-theme(
       primary: mat.$rose-palette,
       tertiary: mat.$violet-palette,
     ),
+    typography: $app-typography,
   )
 );
 
@@ -21,18 +27,56 @@ $dark-theme: mat.define-theme(
       primary: mat.$rose-palette,
       tertiary: mat.$violet-palette,
     ),
+    typography: $app-typography,
   )
 );
 
+$theme-transition-duration: 300ms;
+$theme-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+$theme-transition-properties:
+  background-color, color, border-color, fill, stroke, box-shadow, outline-color;
+
 html {
+  // Shared structure, typography, and density; only color tokens differ per theme class.
+  @include mat.all-component-bases($light-theme);
+  @include mat.all-component-typographies($light-theme);
+  @include mat.all-component-densities($light-theme);
+
   .light-theme {
-    @include mat.all-component-themes($light-theme);
+    @include mat.all-component-colors($light-theme);
   }
 
   .dark-theme {
     @include mat.all-component-colors($dark-theme);
-    .mat-toolbar {
-      font-size: 22px; // without this, font-size goes down to 16px in dark mode
+  }
+}
+
+// One crossfade for the whole page so every surface changes in sync.
+@supports (view-transition-name: root) {
+  @media (prefers-reduced-motion: no-preference) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation-duration: $theme-transition-duration;
+      animation-timing-function: $theme-transition-timing;
+    }
+  }
+}
+
+// Fallback when View Transitions API is unavailable.
+@supports not (view-transition-name: root) {
+  @media (prefers-reduced-motion: no-preference) {
+    body.light-theme,
+    body.dark-theme,
+    .cdk-overlay-container.light-theme,
+    .cdk-overlay-container.dark-theme,
+    body.light-theme *,
+    body.dark-theme *,
+    .cdk-overlay-container.light-theme *,
+    .cdk-overlay-container.dark-theme * {
+      transition-property: $theme-transition-properties;
+      transition-duration: $theme-transition-duration;
+      transition-timing-function: $theme-transition-timing;
+      transition-delay: 0s;
     }
   }
 }
