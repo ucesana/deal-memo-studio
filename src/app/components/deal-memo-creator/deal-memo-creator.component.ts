@@ -266,6 +266,7 @@ export class DealMemoCreator implements OnInit, OnDestroy, AfterViewInit {
       const includePdf = this.reviewFormGroup.get('pdf')?.value;
 
       this.dealMemos = [];
+      this.destinationFolder = [];
       this._stateService.setCreating(true);
 
       let app: AppFileStructure;
