@@ -14,6 +14,7 @@ import {
   throwError,
 } from 'rxjs';
 import { GoogleAuthService } from './google-auth.service';
+import { GapiLoaderService } from './gapi-loader.service';
 import { filter, map, take } from 'rxjs/operators';
 import { SnackService } from '../common/services/snack.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -40,34 +41,41 @@ export class GoogleDriveService {
 
   private readonly googleAuthService: GoogleAuthService =
     inject(GoogleAuthService);
+  private readonly gapiLoader = inject(GapiLoaderService);
   private readonly googleDocsService = inject(GoogleDocsService);
   private readonly snackService = inject(SnackService);
   private readonly http = inject(HttpClient);
   private readonly dialog = inject(MatDialog);
 
   private isDriveApiLoaded = false;
-  private driveApiLoadedPromise: Promise<any> = new Promise((resolve) => {});
+  private driveApiLoadedPromise: Promise<void> = Promise.resolve();
 
   constructor() {}
 
-  loadDriveApi(): Observable<any> {
+  loadDriveApi(): Observable<void> {
     if (!this.googleAuthService.isAuthenticated()) {
       console.warn('Token not found');
       return throwError(() => new Error('Not signed in to Google API client.'));
     }
 
-    if (!this.isDriveApiLoaded) {
-      this.driveApiLoadedPromise = gapi.client.load(
-        GoogleDriveService.API_NAME,
-        GoogleDriveService.API_VERSION,
-      );
-      this.isDriveApiLoaded = true;
-    }
-    return from(
-      this.driveApiLoadedPromise.then((result) => {
-        return result;
+    return from(this.gapiLoader.whenClientLoaded()).pipe(
+      switchMap(() => {
+        if (!this.isDriveApiLoaded) {
+          this.driveApiLoadedPromise = gapi.client
+            .load(
+              GoogleDriveService.API_NAME,
+              GoogleDriveService.API_VERSION,
+            )
+            .then(() => undefined)
+            .catch((error: unknown) => {
+              this.isDriveApiLoaded = false;
+              this.driveApiLoadedPromise = Promise.reject(error);
+              throw error;
+            });
+          this.isDriveApiLoaded = true;
+        }
+        return from(this.driveApiLoadedPromise);
       }),
-    ).pipe(
       catchError((response) => this.googleAuthService.handleError(response)),
     );
   }
@@ -90,7 +98,7 @@ export class GoogleDriveService {
           >,
       ),
       take(1),
-      map((response) => response.result.files),
+      map((response) => response.result.files ?? []),
       catchError((response) => {
         return this.googleAuthService.handleError(response);
       }),

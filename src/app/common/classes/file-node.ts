@@ -6,12 +6,17 @@ export interface FileNode {
   iconColor: string;
   warning: string | null;
   mimeType: string;
+  /** Undefined = folder not loaded yet; array = loaded (may be empty). */
   children?: FileNode[];
   file: gapi.client.drive.File;
 }
 
+export function areChildrenLoaded(node: FileNode): boolean {
+  return node.children !== undefined;
+}
+
 export function toFileNodes(files: gapi.client.drive.File[]): FileNode[] {
-  return files.map((file) => toFileNode(file));
+  return (files ?? []).map((file) => toFileNode(file));
 }
 
 function getIcon(file: gapi.client.drive.File): string {
@@ -46,9 +51,9 @@ function getWarning(file: gapi.client.drive.File) {
     : null;
 }
 
-function getChildren(file: gapi.client.drive.File) {
+function getChildren(file: gapi.client.drive.File): FileNode[] | undefined {
   return file.mimeType === 'application/vnd.google-apps.folder'
-    ? []
+    ? undefined
     : undefined;
 }
 

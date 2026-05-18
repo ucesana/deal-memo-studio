@@ -47,12 +47,19 @@
       >
         <button
           matIconButton
-          matTreeNodeToggle
-          [attr.aria-label]="'Toggle ' + node.name + '[' + node.id + ']'"
+          type="button"
+          [attr.aria-label]="'Toggle ' + node.name"
+          [attr.aria-expanded]="isExpanded(node)"
+          [disabled]="isNodeLoading(node.id)"
+          (click)="toggleFolder($event, node)"
         >
-          <mat-icon class="mat-icon-rtl-mirror" (click)="toggleFolder(node)">
-            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
-          </mat-icon>
+          @if (isNodeLoading(node.id)) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            <mat-icon class="mat-icon-rtl-mirror">
+              {{ isExpanded(node) ? "expand_more" : "chevron_right" }}
+            </mat-icon>
+          }
         </button>
 
         <app-file-icon [node]="node"></app-file-icon>
