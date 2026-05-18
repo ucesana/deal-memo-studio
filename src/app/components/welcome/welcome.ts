@@ -1,11 +1,11 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-
+import { MatButtonModule } from '@angular/material/button';
 declare const anime: any;
 
 @Component({
   selector: 'app-welcome',
-  imports: [RouterLink],
+  imports: [RouterLink, MatButtonModule],
   templateUrl: './welcome.html',
   styleUrl: './welcome.scss',
 })
