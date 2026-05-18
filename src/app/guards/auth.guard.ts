@@ -1,18 +1,30 @@
-import { CanActivate, Router } from '@angular/router';
 import { inject, Injectable } from '@angular/core';
+import {
+  ActivatedRouteSnapshot,
+  CanActivate,
+  Router,
+  RouterStateSnapshot,
+  UrlTree,
+} from '@angular/router';
 import { GoogleAuthService } from '../services/google-auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  private readonly router: Router = inject(Router);
-  private readonly googleAuthService: GoogleAuthService =
-    inject(GoogleAuthService);
+  private readonly router = inject(Router);
+  private readonly googleAuthService = inject(GoogleAuthService);
 
-  constructor() {}
+  async canActivate(
+    _route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot,
+  ): Promise<boolean | UrlTree> {
+    if (await this.googleAuthService.ensureAuthenticated()) {
+      return true;
+    }
 
-  canActivate(): boolean {
-    return this.googleAuthService.isAuthenticated();
+    return this.router.createUrlTree(['/dashboard/login'], {
+      queryParams: { returnUrl: state.url },
+    });
   }
 }

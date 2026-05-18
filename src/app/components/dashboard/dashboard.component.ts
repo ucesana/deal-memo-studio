@@ -72,18 +72,15 @@ export class DashboardComponent implements OnInit {
       .getIsLoggedIn()
       .pipe(untilDestroyed(this))
       .subscribe((isLoggedIn) => {
-        this._router.navigate(['/dashboard/login']).then(() => {
-          if (isLoggedIn) {
-            this._dealMemoService.loadOrCreateAppData();
-          }
-        });
+        if (isLoggedIn) {
+          this._dealMemoService.loadOrCreateAppData();
+        }
       });
 
     if (this._googleAuthService.isAccessTokenExpired()) {
       if (this._googleAuthService.hasStoredExpiresAt()) {
         this._googleAuthService.openLoginSnack();
       }
-      this._router.navigate(['/dashboard/login']).then();
     }
   }
 

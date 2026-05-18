@@ -69,6 +69,34 @@ export class GoogleAuthService {
     return !!gapi?.client?.getToken();
   }
 
+  /** Restores cookie session into gapi when needed; resolves when auth is ready or absent. */
+  ensureAuthenticated(): Promise<boolean> {
+    if (this.isAuthenticated()) {
+      return Promise.resolve(true);
+    }
+    if (!this.hasStoredAccessToken() || this.isAccessTokenExpired()) {
+      return Promise.resolve(false);
+    }
+    return this.waitForGapi().then(() => {
+      if (this.isAuthenticated()) {
+        return true;
+      }
+      return new Promise<boolean>((resolve) => {
+        const subscription = this.getIsLoggedIn().subscribe((loggedIn) => {
+          if (loggedIn && this.isAuthenticated()) {
+            subscription.unsubscribe();
+            resolve(true);
+          }
+        });
+        this.initAccessToken();
+        setTimeout(() => {
+          subscription.unsubscribe();
+          resolve(this.isAuthenticated());
+        }, 10_000);
+      });
+    });
+  }
+
   logout() {
     if (this.isAuthenticated()) {
       const accessToken = gapi.auth.getToken().access_token;
