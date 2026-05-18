@@ -21,9 +21,7 @@ export class App implements OnInit {
 
   ngOnInit() {
     if (this._googleAuthService.isAccessTokenNotExpired()) {
-      this._googleAuthService.waitForGapi().then(() => {
-        this._googleAuthService.initAccessToken();
-      });
+      this._googleAuthService.initAccessToken();
     }
 
     this._appSettingsService.initTheme();

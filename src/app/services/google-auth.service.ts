@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, throwError } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { SnackService } from '../common/services/snack.service';
+import { GapiLoaderService } from './gapi-loader.service';
 
 declare const google: any;
 declare const gapi: any;
@@ -17,6 +18,7 @@ const SCOPES =
 export class GoogleAuthService {
   private readonly _cookieService = inject(CookieService);
   private readonly _snackService = inject(SnackService);
+  private readonly _gapiLoader = inject(GapiLoaderService);
   private readonly _path: string = '/';
   private readonly _accessTokenCookie = 'access_token';
   private readonly _expiresAtCookie = 'expires_at';
@@ -32,7 +34,7 @@ export class GoogleAuthService {
         client_id: clientId,
         scope: SCOPES,
         callback: (tokenResponse: any) => {
-          gapi.load('client', () => {
+          this._gapiLoader.whenClientLoaded().then(() => {
             this.setCookie(
               this._accessTokenCookie,
               tokenResponse.access_token,
@@ -77,7 +79,7 @@ export class GoogleAuthService {
     if (!this.hasStoredAccessToken() || this.isAccessTokenExpired()) {
       return Promise.resolve(false);
     }
-    return this.waitForGapi().then(() => {
+    return this._gapiLoader.whenClientLoaded().then(() => {
       if (this.isAuthenticated()) {
         return true;
       }
@@ -147,7 +149,7 @@ export class GoogleAuthService {
       this.isLoggedInSubject.next(false);
       this.openLoginSnack();
     } else {
-      gapi.load('client', () => {
+      this._gapiLoader.whenClientLoaded().then(() => {
         gapi.client.setToken({
           access_token: accessToken,
         });
@@ -191,17 +193,6 @@ export class GoogleAuthService {
     }
     console.error('Error accessing Google API:', response.result?.error);
     return throwError(() => response);
-  }
-
-  public waitForGapi(): Promise<void> {
-    return new Promise((resolve) => {
-      if ((window as any).gapi) return resolve();
-      const check = () => {
-        if ((window as any).gapi) resolve();
-        else setTimeout(check, 50);
-      };
-      check();
-    });
   }
 
   private deleteCookie(name: string): void {

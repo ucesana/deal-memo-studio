@@ -25,7 +25,7 @@
     src="https://apis.google.com/js/api.js"
     async
     defer
-    onload="window.gapiLoaded = true"
+    onload="window.dispatchEvent(new Event('gapi-script-loaded'))"
   ></script>
 
   <script
