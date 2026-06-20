@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, from, Observable, switchMap, tap, throwError } from 'rxjs';
+import { catchError, from, Observable, switchMap, throwError } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { GoogleAuthService } from './google-auth.service';
 import { DocumentTagData, TagData } from './tag.service';
@@ -23,15 +23,23 @@ export class GoogleDocsService {
   private isDocsApiLoaded = false;
   private docsApiLoadedPromise: Promise<any> = new Promise((resolve) => {});
 
+  private gapiRequest<T>(
+    request: () => PromiseLike<T> | Observable<T>,
+  ): Observable<T> {
+    return this.googleAuthService.fromAuthorized(() => {
+      const result = request();
+      return result instanceof Observable ? result : from(result);
+    });
+  }
+
   public getDocument(
     documentId: string,
   ): Observable<gapi.client.docs.Document> {
     return this.loadDocsApi().pipe(
-      switchMap(
-        () =>
-          from(gapi.client.docs.documents.get({ documentId })) as Observable<
-            gapi.client.Response<gapi.client.docs.Document>
-          >,
+      switchMap(() =>
+        this.gapiRequest(() =>
+          gapi.client.docs.documents.get({ documentId }),
+        ) as Observable<gapi.client.Response<gapi.client.docs.Document>>,
       ),
       take(1),
       map((response: gapi.client.Response<gapi.client.docs.Document>) => {
@@ -54,8 +62,6 @@ export class GoogleDocsService {
     parentIds: string[] = [],
     targetMimeType: string = 'application/vnd.google-apps.document',
   ): Promise<gapi.client.drive.File> {
-    const accessToken = gapi.auth.getToken().access_token;
-
     const metadata = {
       name: fileName.replace(/\.docx$/, ''),
       mimeType: targetMimeType,
@@ -74,11 +80,10 @@ export class GoogleDocsService {
     );
     form.append('file', blob, metadata.name);
 
-    const response = await fetch(
+    const response = await this.googleAuthService.authorizedFetch(
       'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
       {
         method: 'POST',
-        headers: new Headers({ Authorization: 'Bearer ' + accessToken }),
         body: form,
       },
     );
@@ -116,7 +121,7 @@ export class GoogleDocsService {
     tagData: TagData,
     title: string,
   ): Observable<SimpleGoogleFile> {
-    return from(
+    return this.gapiRequest(() =>
       gapi.client.drive.files.copy({
         fileId: documentId,
         resource: {
@@ -138,7 +143,7 @@ export class GoogleDocsService {
           },
         }));
 
-        return from(
+        return this.gapiRequest(() =>
           gapi.client.docs.documents.batchUpdate({
             documentId: id,
             resource: { requests },

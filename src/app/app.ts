@@ -20,10 +20,7 @@ export class App implements OnInit {
   }
 
   ngOnInit() {
-    if (this._googleAuthService.isAccessTokenNotExpired()) {
-      this._googleAuthService.initAccessToken();
-    }
-
+    this._googleAuthService.initializeSession();
     this._appSettingsService.initTheme();
   }
 }

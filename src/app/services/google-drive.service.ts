@@ -52,6 +52,44 @@ export class GoogleDriveService {
 
   constructor() {}
 
+  private gapiRequest<T>(
+    request: () => PromiseLike<T> | Observable<T>,
+  ): Observable<T> {
+    return this.googleAuthService.fromAuthorized(() => {
+      const result = request();
+      return result instanceof Observable ? result : from(result);
+    });
+  }
+
+  private authorizedHttpGetBlob(url: string): Observable<Blob> {
+    return this.googleAuthService.fromAuthorized(() =>
+      from(this.googleAuthService.getAccessToken()).pipe(
+        switchMap((accessToken) => {
+          const headers = new HttpHeaders({
+            Authorization: `Bearer ${accessToken}`,
+          });
+          return this.http.get(url, { headers, responseType: 'blob' });
+        }),
+      ),
+    );
+  }
+
+  private authorizedHttpPost<T>(
+    url: string,
+    body: FormData,
+  ): Observable<T> {
+    return this.googleAuthService.fromAuthorized(() =>
+      from(this.googleAuthService.getAccessToken()).pipe(
+        switchMap((accessToken) => {
+          const headers = new HttpHeaders({
+            Authorization: `Bearer ${accessToken}`,
+          });
+          return this.http.post<T>(url, body, { headers });
+        }),
+      ),
+    );
+  }
+
   loadDriveApi(): Observable<void> {
     if (!this.googleAuthService.isAuthenticated()) {
       console.warn('Token not found');
@@ -84,7 +122,7 @@ export class GoogleDriveService {
     return this.loadDriveApi().pipe(
       switchMap(
         () =>
-          from(
+          this.gapiRequest(() =>
             gapi.client.drive.files.list({
               pageSize: 100,
               fields:
@@ -124,22 +162,19 @@ export class GoogleDriveService {
   }
 
   exportPdfAsBlob(fileId: string): Observable<Blob> {
-    const accessToken = gapi.auth.getToken().access_token;
     const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${accessToken}`,
-    });
-    return this.http.get(url, { headers, responseType: 'blob' });
+    return this.authorizedHttpGetBlob(url);
   }
 
   exportFileAsText(fileId: string): Observable<string> {
     return this.loadDriveApi().pipe(
       switchMap(() =>
-        from(
-          gapi.client.drive.files.export({
-            fileId,
-            mimeType: 'text/plain',
-          }) as Observable<gapi.client.Response<string>>,
+        this.gapiRequest(
+          () =>
+            gapi.client.drive.files.export({
+              fileId,
+              mimeType: 'text/plain',
+            }) as Observable<gapi.client.Response<string>>,
         ),
       ),
       take(1),
@@ -150,11 +185,12 @@ export class GoogleDriveService {
   exportFileAsPdf(fileId: string): Observable<Blob> {
     return this.loadDriveApi().pipe(
       switchMap(() =>
-        from(
-          gapi.client.drive.files.export({
-            fileId,
-            mimeType: 'application/pdf',
-          }) as Observable<gapi.client.Response<Blob>>,
+        this.gapiRequest(
+          () =>
+            gapi.client.drive.files.export({
+              fileId,
+              mimeType: 'application/pdf',
+            }) as Observable<gapi.client.Response<Blob>>,
         ),
       ),
       take(1),
@@ -182,9 +218,9 @@ export class GoogleDriveService {
     return this.loadDriveApi().pipe(
       switchMap(
         () =>
-          from(gapi.client.drive.files.get({ ...query, fileId })) as Observable<
-            gapi.client.Response<gapi.client.drive.File>
-          >,
+          this.gapiRequest(() =>
+            gapi.client.drive.files.get({ ...query, fileId }),
+          ) as Observable<gapi.client.Response<gapi.client.drive.File>>,
       ),
       take(1),
       map((response: gapi.client.Response<gapi.client.drive.File>) =>
@@ -202,7 +238,7 @@ export class GoogleDriveService {
   ): Observable<gapi.client.drive.File[]> {
     return this.loadDriveApi().pipe(
       switchMap(() =>
-        from(
+        this.gapiRequest(() =>
           gapi.client.drive.files.list({
             q: [
               `name = '${title.replace(/'/g, "\\'")}'`,
@@ -229,7 +265,7 @@ export class GoogleDriveService {
     return this.loadDriveApi().pipe(
       switchMap(
         () =>
-          from(
+          this.gapiRequest(() =>
             gapi.client.drive.files.list({
               q: [
                 `name = '${name.replace(/'/g, "\\'")}'`,
@@ -257,15 +293,16 @@ export class GoogleDriveService {
   createFolder(name: string, parentId: string = 'root'): Observable<string> {
     return this.loadDriveApi().pipe(
       switchMap(() =>
-        from(
-          gapi.client.drive.files.create({
-            resource: {
-              name,
-              mimeType: 'application/vnd.google-apps.folder',
-              parents: [parentId],
-            },
-            fields: 'id',
-          }) as Observable<gapi.client.Response<gapi.client.drive.File>>,
+        this.gapiRequest(
+          () =>
+            gapi.client.drive.files.create({
+              resource: {
+                name,
+                mimeType: 'application/vnd.google-apps.folder',
+                parents: [parentId],
+              },
+              fields: 'id',
+            }) as Observable<gapi.client.Response<gapi.client.drive.File>>,
         ),
       ),
       take(1),
@@ -318,16 +355,17 @@ export class GoogleDriveService {
     folderId: string = 'root',
   ): Observable<gapi.client.drive.File> {
     return this.loadDriveApi().pipe(
-      switchMap((_) => {
-        return from(
-          gapi.client.drive.files.update({
-            fileId,
-            addParents: folderId,
-            removeParents: 'root',
-            fields: 'id, parents',
-          }),
-        ) as Observable<gapi.client.Response<gapi.client.drive.File>>;
-      }),
+      switchMap((_) =>
+        this.gapiRequest(
+          () =>
+            gapi.client.drive.files.update({
+              fileId,
+              addParents: folderId,
+              removeParents: 'root',
+              fields: 'id, parents',
+            }),
+        ) as Observable<gapi.client.Response<gapi.client.drive.File>>,
+      ),
       take(1),
       map(
         (response: gapi.client.Response<gapi.client.drive.File>) =>
@@ -362,13 +400,14 @@ export class GoogleDriveService {
     let originalFile: gapi.client.drive.File = {};
 
     return forkJoin([
-      from(
-        gapi.client.drive.files.export({
-          fileId,
-          mimeType:
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        }),
-      ) as Observable<gapi.client.Response<Blob>>,
+      this.gapiRequest(
+        () =>
+          gapi.client.drive.files.export({
+            fileId,
+            mimeType:
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          }) as Observable<gapi.client.Response<Blob>>,
+      ),
       this.getFile(fileId, {
         fields: 'id, name, mimeType, parents',
       }).pipe(filter((o) => !!o)),
@@ -417,15 +456,9 @@ export class GoogleDriveService {
         );
         form.append('file', pdfFile);
 
-        const accessToken = gapi.auth.getToken().access_token;
-        const headers = new HttpHeaders({
-          Authorization: `Bearer ${accessToken}`,
-        });
-
-        return this.http.post<gapi.client.drive.File>(
+        return this.authorizedHttpPost<gapi.client.drive.File>(
           'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
           form,
-          { headers },
         );
       }),
       catchError((response) => {
@@ -510,17 +543,9 @@ export class GoogleDriveService {
           return throwError(() => new Error('File cannot be converted to PDF'));
         }
 
-        const accessToken = gapi.auth.getToken().access_token;
-        const headers = new HttpHeaders({
-          Authorization: `Bearer ${accessToken}`,
-        });
-
-        return this.http
-          .get(url, {
-            headers,
-            responseType: 'blob',
-          })
-          .pipe(switchMap((blob: Blob) => of({ file: fileInfo, blob })));
+        return this.authorizedHttpGetBlob(url).pipe(
+          switchMap((blob: Blob) => of({ file: fileInfo, blob })),
+        );
       }),
       catchError((response) => {
         return this.googleAuthService.handleError(response);

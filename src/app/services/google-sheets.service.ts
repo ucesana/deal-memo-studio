@@ -28,6 +28,15 @@ export class GoogleSheetsService {
 
   constructor() {}
 
+  private gapiRequest<T>(
+    request: () => PromiseLike<T> | Observable<T>,
+  ): Observable<T> {
+    return this.googleAuthService.fromAuthorized(() => {
+      const result = request();
+      return result instanceof Observable ? result : from(result);
+    });
+  }
+
   loadSheetsApi(): Observable<gapi.client.Response<any>> {
     if (!this.googleAuthService.isAuthenticated()) {
       console.warn('Token not found');
@@ -53,14 +62,12 @@ export class GoogleSheetsService {
   ): Observable<gapi.client.sheets.Spreadsheet> {
     return this.loadSheetsApi().pipe(
       switchMap((_) =>
-        from(
+        this.gapiRequest(() =>
           gapi.client.sheets.spreadsheets.get({
             spreadsheetId,
             includeGridData: true,
-          }) as Observable<
-            gapi.client.Response<gapi.client.sheets.Spreadsheet>
-          >,
-        ),
+          }),
+        ) as Observable<gapi.client.Response<gapi.client.sheets.Spreadsheet>>,
       ),
       take(1),
       map((response) => response.result),
@@ -74,13 +81,12 @@ export class GoogleSheetsService {
     spreadsheet: Spreadsheet,
   ): Observable<gapi.client.sheets.Spreadsheet> {
     return this.loadSheetsApi().pipe(
-      switchMap(
-        () =>
-          from(
-            gapi.client.sheets.spreadsheets.create(
-              this.toSpreadsheetPayload(spreadsheet),
-            ),
-          ) as Observable<gapi.client.Response<gapi.client.sheets.Spreadsheet>>,
+      switchMap(() =>
+        this.gapiRequest(() =>
+          gapi.client.sheets.spreadsheets.create(
+            this.toSpreadsheetPayload(spreadsheet),
+          ),
+        ) as Observable<gapi.client.Response<gapi.client.sheets.Spreadsheet>>,
       ),
       take(1),
       map(
